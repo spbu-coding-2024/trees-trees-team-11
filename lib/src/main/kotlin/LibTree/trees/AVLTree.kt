@@ -42,7 +42,7 @@ class AVLTree<K : Comparable<K>, V>(
                         } else
                             localNode = tempNode
                     } else {
-                        var tempNode2 = minValueNode(localNode.right)
+                        val tempNode2 = minValueNode(localNode.right)
                         if (tempNode2 != null) {
                             localNode.key = tempNode2.key
                             localNode.right = eraseNode(localNode.right, tempNode2.key)
@@ -197,6 +197,4 @@ class AVLTree<K : Comparable<K>, V>(
             return node
         return minValueNode(node.left)
     }
-
-
 }
