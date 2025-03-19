@@ -83,9 +83,14 @@ class AVLTree<K : Comparable<K>, V>(
     }
 
     override fun containsKey(key: K): Boolean {
-        for ((k, _) in this) {
-            if (k == key) {
-                return true
+        var localRoot = root
+        if(localRoot == null)
+            return false
+        while(localRoot != null) {
+            when {
+                key < localRoot.key -> localRoot = localRoot.left
+                key > localRoot.key -> localRoot = localRoot.right
+                else -> return true
             }
         }
         return false
