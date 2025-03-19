@@ -18,12 +18,68 @@ class AVLTree<K : Comparable<K>, V>(
             get() = (left?.height ?: 0).toInt() - (right?.height ?: 0).toInt()
     }
 
-    override fun height(): Int {
-        TODO("Not yet implemented")
+    override fun height() : Int {
+        return heightOfTree(root)
     }
 
     override fun erase(key: K) {
-        TODO("Not yet implemented")
+        root = eraseNode(root, key)
+    }
+
+    private fun eraseNode (node: AVLNode<K,V>?, key: K) : AVLNode<K,V>? {
+        var localNode = node
+        if (localNode == null)
+            return localNode
+            when {
+                key < localNode.key -> localNode.left = eraseNode(localNode.left, key)
+                key > localNode.key -> localNode.right = eraseNode(localNode.right, key)
+                else -> {
+                    if((localNode.left == null) || (localNode.right == null)) {
+                        var tempNode = if(localNode.left != null)  localNode.left else localNode.right
+                        if(tempNode == null) {
+                            tempNode = node
+                            localNode = null
+                        } else
+                            localNode = tempNode
+                    } else {
+                        var tempNode2 = minValueNode(localNode.right)
+                        if (tempNode2 != null) {
+                            localNode.key = tempNode2.key
+                            localNode.right = eraseNode(localNode.right, tempNode2.key)
+                        }
+
+                    }
+                }
+
+            }
+
+        if(localNode == null)
+            return localNode
+
+        localNode.height = 1 + max(heightNode(localNode.left), heightNode(localNode.right))
+
+        val leftNode = localNode.left
+        val rightNode = localNode.right
+
+        val balance = getBalance(localNode)
+
+        if(balance > 1 && getBalance(leftNode) >= 0)
+            return rightRotate(localNode)
+        if(balance > 1 && getBalance(leftNode) < 0) {
+            localNode.left = leftRotate(leftNode)
+            return rightRotate(localNode)
+        }
+
+        if(balance < -1 && getBalance(rightNode) <= 0)
+            return leftRotate(localNode)
+        if(balance < -1 && getBalance(rightNode) > 0) {
+            localNode.right = rightRotate(rightNode)
+            return leftRotate(localNode)
+        }
+
+        return localNode
+
+
     }
 
     override fun containsKey(key: K): Boolean {
@@ -37,25 +93,6 @@ class AVLTree<K : Comparable<K>, V>(
 
     override fun insert(key: K, value: V) {
         root = insertNode(root, key, value)
-    }
-
-    private fun balanceNode(node: AVLNode<K, V>?) : AVLNode<K, V> {
-       TODO()
-    }
-
-    private fun insertNode(node: AVLNode<K,V>?, key: K, value: V) : AVLNode<K, V> {
-        if(node == null) {
-            return AVLNode(key, value)
-        }
-        when {
-                key < node.key -> node.left = insertNode(node.left, key, value)
-                key > node.key -> node.right = insertNode(node.right, key, value)
-                else -> node.value = value
-        }
-
-        node.height = 1 + max(node.left?.height ?: 0, node.right?.height ?: 0)
-
-        return balanceNode(node)
     }
 
     override fun clean() {
@@ -74,5 +111,87 @@ class AVLTree<K : Comparable<K>, V>(
         return result.iterator()
     }
 
-}
 
+    private fun heightNode(node: AVLNode<K, V>?): Long {
+        if(node == null) return 0
+        return node.height
+    }
+
+
+    private fun rightRotate(node: AVLNode<K, V>?) : AVLNode<K, V>? {
+        val newNode = node?.left
+        val tempNode = newNode?.right
+
+        newNode?.right = node
+        node?.left = tempNode
+
+        node?.height = 1 + max(heightNode(node?.left), heightNode(node?.right))
+        newNode?.height = 1 + max(heightNode(newNode?.left), heightNode(newNode?.right))
+
+        return newNode
+    }
+
+    private fun leftRotate(node: AVLNode<K, V>?) : AVLNode<K, V>? {
+        val newNode = node?.right
+        val tempNode = newNode?.left
+
+        newNode?.left = node
+        node?.right = tempNode
+
+        node?.height = 1 + max(heightNode(node?.left), heightNode(node?.right))
+        newNode?.height = 1 + max(heightNode(newNode?.left), heightNode(newNode?.right))
+
+        return newNode
+    }
+
+    private fun getBalance(node: AVLNode<K, V>?) : Long {
+       if (node == null) {
+           return 0
+       }
+       return heightNode(node.left) - heightNode(node.right)
+
+    }
+
+    private fun insertNode(node: AVLNode<K,V>?, key: K, value: V) : AVLNode<K, V>? {
+        if (node == null)
+            return AVLNode(key, value)
+        when {
+            key < node.key -> node.left = insertNode(node.left, key, value)
+            key > node.key -> node.right = insertNode(node.right, key, value)
+            else -> return node
+        }
+
+        node.height = 1 + max(heightNode(node.left), heightNode(node.right))
+        val leftNode = node.left
+        val rightNode = node.right
+
+        val balance = getBalance(node)
+
+        if(balance > 1 && leftNode != null && key < leftNode.key)
+            return rightRotate(node)
+        if(balance < -1 && rightNode != null && key > rightNode.key)
+            return leftRotate(node)
+        if(balance > 1 && leftNode != null && key > leftNode.key) {
+            node.left = leftRotate(node.left)
+            return rightRotate(node)
+        }
+        if(balance < -1 && rightNode != null && key < rightNode.key) {
+            node.right = rightRotate(node.right)
+            return leftRotate(node)
+        }
+        return node
+    }
+
+    private fun heightOfTree(node: AVLNode<K, V>?): Int {
+        if (node == null) return 0
+        return max(heightOfTree(node.left), heightOfTree(node.right))
+    }
+
+    private fun minValueNode (node: AVLNode<K, V>?): AVLNode<K, V>? {
+        if(node?.left == null)
+            return node
+        return minValueNode(node.left)
+    }
+
+
+}
