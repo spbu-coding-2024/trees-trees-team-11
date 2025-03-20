@@ -16,6 +16,8 @@ class AVLTree<K : Comparable<K>, V> private constructor (
     ) : BaseNode<K, V, AVLNode<K, V>>(key, value, left, right, height) {
     }
 
+    fun getRoot() : AVLNode<K, V>? = root
+
     constructor(
         key: K,
         value: V
