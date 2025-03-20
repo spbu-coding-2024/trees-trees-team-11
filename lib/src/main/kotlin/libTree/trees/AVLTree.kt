@@ -1,9 +1,9 @@
-package LibTree.trees
+package libTree.trees
 
-import LibTree.interfaceTree.Tree
+import libTree.interfaceTree.Tree
 import kotlin.math.max
 
-class AVLTree<K : Comparable<K>, V>(
+class AVLTree<K : Comparable<K>, V> private constructor (
     private var root: AVLNode<K, V>? = null,
 ) : Tree<K, V, AVLTree.AVLNode<K, V>> {
 
@@ -159,7 +159,6 @@ class AVLTree<K : Comparable<K>, V>(
             return 0
         }
         return heightNode(node.left) - heightNode(node.right)
-
     }
 
     private fun insertNode(node: AVLNode<K, V>?, key: K, value: V): AVLNode<K, V>? {
