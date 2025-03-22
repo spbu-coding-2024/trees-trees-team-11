@@ -1,13 +1,7 @@
 name: Trees Building and Testing
 run-name: ${{ github.actor }} is testing out Trees
 
-on:
-  pull_request:
-    paths:
-      - .github/workflows/build_and_test.yaml
-  push:
-    paths:
-      - .github/workflows/build_and_test.yaml
+on: [push, pull_request]
 
 jobs:
 
