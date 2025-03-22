@@ -1,7 +1,17 @@
 name: Trees Building and Testing
 run-name: ${{ github.actor }} is testing out Trees
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - lib/src/main/kotlin/libTree/trees/AVLTree.kt
+      - lib/src/test/kotlin/libTreeTests/AVLTreeTest.kt
+      - lib/src/test/kotlin/libTreeTestsUtils/AVLTreeTestsUtils.kt
+  pull_request:
+    paths:
+      - lib/src/main/kotlin/libTree/trees/AVLTree.kt
+      - lib/src/test/kotlin/libTreeTests/AVLTreeTest.kt
+      - lib/src/test/kotlin/libTreeTestsUtils/AVLTreeTestsUtils.kt
 
 jobs:
 
