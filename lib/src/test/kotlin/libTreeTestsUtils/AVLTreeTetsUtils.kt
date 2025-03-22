@@ -16,6 +16,7 @@ class UtilsFunctions {
 
         return is_balanced(root.left) && is_balanced(root.right)
     }
+
     fun<K:Comparable<K>, V> nodesInTreeCounter(tree: AVLTree<K, V>?): Int {
         if(tree == null) return 0
         val listOfNodes = mutableListOf<K>()
@@ -35,14 +36,8 @@ class UtilsFunctions {
         }
     }
 
-
-
-
     private fun<K : Comparable<K>,V> height(node: AVLTree.AVLNode<K, V>?) : Int {
         if(node == null) return 0
         return 1 + max(height(node.left), height(node.right))
     }
-
-
-
 }

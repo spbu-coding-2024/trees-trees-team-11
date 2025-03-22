@@ -9,12 +9,13 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
-import kotlin.math.max
 import kotlin.random.Random
 
 open class AVLTreeTest {
+
     private lateinit var checker: UtilsFunctions
     private lateinit var tree: AVLTree<Int, String>
+
     @BeforeEach
     fun setupTest() {
         checker = UtilsFunctions()
@@ -153,8 +154,8 @@ open class AVLTreeTest {
 
     @Test
     @Tag("slow")
-    @Timeout(5, unit = TimeUnit.SECONDS)
-    fun `AVLTree inserting to many nodes`() {
+    @Timeout(1, unit = TimeUnit.SECONDS)
+    fun `AVLTree inserting to many nodes (stress test)`() {
         repeat(75000) {
             tree.insert(Random.nextInt(0,999), Random.nextInt(0,999).toString())
         }
@@ -164,13 +165,14 @@ open class AVLTreeTest {
     @Test
     @Tag("corner-case")
     fun `Test erase non-existing key does not modify tree`() {
-        repeat(10) {
-            tree.insert(Random.nextInt(10,100), Random.nextInt(0,100).toString())
-        }
+
+        tree.insert(12,"A")
         tree.erase(0)
-        assertEquals(10, checker.nodesInTreeCounter(tree))
+        println(checker.nodesInTreeCounter(tree))
+        assertEquals(1, checker.nodesInTreeCounter(tree))
         assertTrue(checker.is_balanced(tree.getRoot()))
     }
+
     @Test
     @Tag("corner-case")
     fun `Test for erasing key from empty AVLTree`() {
@@ -182,13 +184,11 @@ open class AVLTreeTest {
     @Test
     @Tag("corner-case")
     fun `Test for double insert key in AVLTree`() {
-        repeat(10) {
-            tree.insert(Random.nextInt(10,100), Random.nextInt(0,100).toString())
-        }
         tree.insert(101, "10")
         tree.insert(101, "12")
-        assertEquals(11, checker.nodesInTreeCounter(tree))
-        assertEquals("12", checker.showKeyValue(tree.getRoot(), 101))
+        println(checker.nodesInTreeCounter(tree))
+        assertEquals(1, checker.nodesInTreeCounter(tree))
+        assertEquals("12", checker.showKeyValue(tree.getRoot(), 101).value)
         assertTrue(checker.is_balanced(tree.getRoot()))
     }
 
@@ -220,4 +220,5 @@ open class AVLTreeTest {
         assertEquals(10, tree.getRoot()?.left?.key)
         assertEquals(30, tree.getRoot()?.right?.key)
     }
+
 }
