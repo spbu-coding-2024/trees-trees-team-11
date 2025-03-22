@@ -7,12 +7,12 @@ class UtilsFunctions {
 
     fun<K : Comparable<K>,V : Any> is_balanced(root: AVLTree.AVLNode<K, V>?): Boolean {
 
-        if(root == null) return false
+        if(root == null) return true
 
         val lhs = height(root.left)
         val rhs = height(root.right)
 
-        if (abs(rhs - lhs) > 2) return false
+        if (abs(rhs - lhs) > 1) return false
 
         return is_balanced(root.left) && is_balanced(root.right)
     }
