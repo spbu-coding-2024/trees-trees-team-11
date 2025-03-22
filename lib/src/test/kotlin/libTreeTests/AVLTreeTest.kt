@@ -13,8 +13,10 @@ import kotlin.math.max
 import kotlin.random.Random
 
 open class AVLTreeTest {
+
     private lateinit var checker: UtilsFunctions
     private lateinit var tree: AVLTree<Int, String>
+
     @BeforeEach
     fun setupTest() {
         checker = UtilsFunctions()
@@ -171,6 +173,7 @@ open class AVLTreeTest {
         assertEquals(1, checker.nodesInTreeCounter(tree))
         assertTrue(checker.is_balanced(tree.getRoot()))
     }
+
     @Test
     @Tag("corner-case")
     fun `Test for erasing key from empty AVLTree`() {
@@ -218,4 +221,5 @@ open class AVLTreeTest {
         assertEquals(10, tree.getRoot()?.left?.key)
         assertEquals(30, tree.getRoot()?.right?.key)
     }
+
 }
