@@ -20,7 +20,7 @@ jobs:
           java-version: 17
           distribution: 'temurin'
       - name: Build with Gradle
-        run: ./gradlew -b ci.gradle build
+        run: ./gradlew build
 
   ktlint:
     runs-on: ubuntu-latest
