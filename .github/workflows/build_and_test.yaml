@@ -3,18 +3,10 @@ run-name: ${{ github.actor }} is testing out Trees
 
 on:
   push:
-    paths:
-      - lib/src/main/kotlin/libTree/trees/AVLTree.kt
-      - lib/src/test/kotlin/libTreeTests/AVLTreeTest.kt
-      - lib/src/test/kotlin/libTreeTestsUtils/AVLTreeTestsUtils.kt
+    branches:
+      - main
   pull_request:
-    paths:
-      - lib/src/main/kotlin/libTree/trees/AVLTree.kt
-      - lib/src/test/kotlin/libTreeTests/AVLTreeTest.kt
-      - lib/src/test/kotlin/libTreeTestsUtils/AVLTreeTestsUtils.kt
-
 jobs:
-
   build-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -25,7 +17,6 @@ jobs:
           distribution: 'temurin'
       - name: Build with Gradle
         run: ./gradlew build
-
   ktlint:
     runs-on: ubuntu-latest
     steps:
@@ -35,4 +26,3 @@ jobs:
           report-path: build/*.xml
           ignore-warnings: true
         continue-on-error: false
-
