@@ -17,11 +17,12 @@ class AVLTree<K : Comparable<K>, V> private constructor (
     }
 
     fun getRoot() : AVLNode<K, V>? = root
+    fun setRoot(node: AVLNode<K,V>?) {
+        root = node
+    }
 
-    constructor(
-        key: K,
-        value: V
-    ) : this(AVLNode(key,value))
+    constructor() : this(null)
+
 
     override fun height(): Int {
         return heightOfTree(root)
@@ -61,23 +62,24 @@ class AVLTree<K : Comparable<K>, V> private constructor (
 
         val balance = getBalance(localNode)
 
-        if (balance > 1 && getBalance(leftNode) >= 0)
-            return rightRotate(localNode)
-        if (balance > 1 && getBalance(leftNode) < 0) {
-            localNode.left = leftRotate(leftNode)
-            return rightRotate(localNode)
+        if(balance > 1) {
+            if (getBalance(leftNode) >= 0)
+                return rightRotate(localNode)
+            if (getBalance(leftNode) < 0) {
+                localNode.left = leftRotate(leftNode)
+                return rightRotate(localNode)
+            }
         }
-
-        if (balance < -1 && getBalance(rightNode) <= 0)
-            return leftRotate(localNode)
-        if (balance < -1 && getBalance(rightNode) > 0) {
-            localNode.right = rightRotate(rightNode)
-            return leftRotate(localNode)
+        if (balance < -1) {
+            if (getBalance(rightNode) <= 0)
+                return leftRotate(localNode)
+            if (getBalance(rightNode) > 0) {
+                localNode.right = rightRotate(rightNode)
+                return leftRotate(localNode)
+            }
         }
 
         return localNode
-
-
     }
 
     override fun containsKey(key: K): Boolean {
@@ -159,7 +161,10 @@ class AVLTree<K : Comparable<K>, V> private constructor (
         when {
             key < node.key -> node.left = insertNode(node.left, key, value)
             key > node.key -> node.right = insertNode(node.right, key, value)
-            else -> return node
+            else -> {
+                node.value = value
+                return node
+            }
         }
 
         node.height = 1 + max(heightNode(node.left), heightNode(node.right))
@@ -168,18 +173,24 @@ class AVLTree<K : Comparable<K>, V> private constructor (
 
         val balance = getBalance(node)
 
-        if (balance > 1 && leftNode != null && key < leftNode.key)
-            return rightRotate(node)
-        if (balance < -1 && rightNode != null && key > rightNode.key)
-            return leftRotate(node)
-        if (balance > 1 && leftNode != null && key > leftNode.key) {
-            node.left = leftRotate(node.left)
-            return rightRotate(node)
+        if(balance < -1 && rightNode != null) {
+            if(key > rightNode.key)
+                return leftRotate(node)
+            else {
+                node.right = rightRotate(node.right)
+                return leftRotate(node)
+            }
         }
-        if (balance < -1 && rightNode != null && key < rightNode.key) {
-            node.right = rightRotate(node.right)
-            return leftRotate(node)
+
+        if(balance > 1 && leftNode != null) {
+            if(key < leftNode.key)
+                return rightRotate(node)
+            else {
+                node.left = leftRotate(node.left)
+                return rightRotate(node)
+            }
         }
+
         return node
     }
 
