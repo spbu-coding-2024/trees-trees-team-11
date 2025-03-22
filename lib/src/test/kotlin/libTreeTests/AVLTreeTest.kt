@@ -45,19 +45,37 @@ open class AVLTreeTest {
             Arguments.of(
                 listOf(30 to "A", 10 to "B", 20 to "C"),
                 listOf(20, 10, 30)
-            )
+            ),
+            Arguments.of(
+                listOf(10 to "A", 20 to "B", 30 to "C"),
+                listOf(20, 10, 30)
+            ),
 
         )
         @JvmStatic
         fun eraseTestCases(): Stream<Arguments> = Stream.of(
             Arguments.of(
                 listOf(10 to "A", 20 to "B", 30 to "C"),
-                listOf(20)
+                listOf(20),
+                listOf(30, 10)
             ),
             Arguments.of(
                 listOf(50 to "A", 30 to "B", 70 to "C", 10 to "D", 40 to "E"),
-                listOf(30, 40, 50)
-            )
+                listOf(30, 40, 50),
+                listOf(70,10)
+            ),
+            Arguments.of(
+                listOf(50 to "A",40 to "K", 80 to "B", 20 to "C", 30 to "D", 60 to "E", 100 to "F", 55 to "G", 70 to "H", 90 to "J", 110 to "I"),
+                listOf(80),
+                listOf(50, 30, 20, 40, 90, 60, 55, 70, 100, 110)
+
+            ),
+            Arguments.of(
+                listOf(50 to "A",40 to "K", 80 to "B", 90 to "C"),
+                listOf(80),
+                listOf(50,40,90)
+            ),
+
         )
         @JvmStatic
         fun cleanTestCases(): Stream<Arguments> = Stream.of(
@@ -104,6 +122,7 @@ open class AVLTreeTest {
             treeList.add(key)
         }
 
+
         assertEquals(resultNodes, treeList)
         assertTrue(checker.is_balanced(tree.getRoot()))
         assertEquals(inserts.size, checker.nodesInTreeCounter(tree))
@@ -112,13 +131,17 @@ open class AVLTreeTest {
     @ParameterizedTest
     @MethodSource("eraseTestCases")
     @Tag("erase")
-    fun `Tests for erasing only contains nodes in AVLTree`(inserts: List<Pair<Int,String>>, erases: List<Int>) {
+    fun `Tests for erasing only contains nodes in AVLTree`(inserts: List<Pair<Int,String>>, erases: List<Int>, resultNodes: List<Int>) {
+        val treeList = mutableListOf<Int>()
         inserts.forEach { (key, value) -> tree.insert(key, value) }
         erases.forEach{key ->
             tree.erase(key)
             assertTrue(checker.is_balanced(tree.getRoot()))
         }
-
+        for ((key, _) in tree) {
+            treeList.add(key)
+        }
+        assertEquals(resultNodes, treeList)
         assertEquals(inserts.size - erases.size, checker.nodesInTreeCounter(tree))
     }
 
@@ -150,16 +173,6 @@ open class AVLTreeTest {
         inserts.forEach { (key, value) -> tree.insert(key, value) }
         assertTrue(checker.is_balanced(tree.getRoot()))
         assertEquals(correctHeightOfTree, tree.height())
-    }
-
-    @Test
-    @Tag("slow")
-    @Timeout(1, unit = TimeUnit.SECONDS)
-    fun `AVLTree inserting to many nodes (stress test)`() {
-        repeat(75000) {
-            tree.insert(Random.nextInt(0,999), Random.nextInt(0,999).toString())
-        }
-        assertTrue(checker.is_balanced(tree.getRoot()))
     }
 
     @Test
@@ -221,4 +234,17 @@ open class AVLTreeTest {
         assertEquals(30, tree.getRoot()?.right?.key)
     }
 
+
+    @Test
+    @Tag("slow")
+    @Timeout(1, unit = TimeUnit.SECONDS)
+    fun `AVLTree inserting to many nodes with random values (stress test)`() {
+        repeat(100000) {
+            tree.insert(Random.nextInt(0,999), Random.nextInt(0,999).toString())
+        }
+        repeat(3000) {
+            tree.erase(Random.nextInt(0,999))
+        }
+        assertTrue(checker.is_balanced(tree.getRoot()))
+    }
 }
