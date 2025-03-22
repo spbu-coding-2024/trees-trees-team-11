@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
-import kotlin.math.max
 import kotlin.random.Random
 
 open class AVLTreeTest {
