@@ -1,4 +1,4 @@
-package LibTree.trees
+package libTree.trees
 
 
 open class BaseNode<K: Comparable<K>,V, TreeNode> (

@@ -1,4 +1,4 @@
-package LibTree.interfaceTree
+package libTree.interfaceTree
 
 interface Tree<K : Comparable<K>,V, root> : Iterable<Pair<K,V>> {
     fun height(): Int
