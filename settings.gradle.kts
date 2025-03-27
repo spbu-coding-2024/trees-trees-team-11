@@ -15,3 +15,4 @@ rootProject.name = "trees-trees-team-11"
 include(":lib")
 include(":examples:exampleAVL")
 include(":examples:exampleRB")
+include(":examples:exampleBST")

@@ -1,13 +1,13 @@
-import libTree.trees.RBTree
+import libTree.trees.BSTree
 
 fun main() {
-    //create RBTree object
-    val tree = RBTree<Int,Int>()
+    //create AVLTree object
+    val tree = BSTree<Int,Int>()
 
-    //inserting node in RBTree
+    //inserting node in AVLTree
     tree.insert(4,4)
 
-    //erasing node from RBTree
+    //erasing node from AVLTree
     tree.erase(4)
 
     //clean tree
@@ -18,13 +18,14 @@ fun main() {
     tree.insert(10,9)
     tree.insert(11,9)
     tree.insert(12,9)
-    //checking height of RBTree
+    //checking height of AVLTree
     tree.height()
 
-    //checking for contains key in RBTree
+    //checking for contains key in AVLTree
     tree.containsKey(11)
     tree.containsKey(0)
-    //iterating in preOrder
+
+    //iterating in InOrder
     for(node in tree) {
         print("${node}\n")
     }
