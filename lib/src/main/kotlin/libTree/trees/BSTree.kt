@@ -19,8 +19,6 @@ class BSTree<K : Comparable<K>, V> private constructor(
 
     constructor() : this(null)
 
-    // ======================== Tree Methods ========================
-
     /**
      * Returns the height of the tree using recursive approach
      */
@@ -40,8 +38,6 @@ class BSTree<K : Comparable<K>, V> private constructor(
     override fun clean() {
         root = null
     }
-
-    // ======================== Key Methods ========================
 
     /**
      * Checks if the tree contains a key
@@ -69,9 +65,7 @@ class BSTree<K : Comparable<K>, V> private constructor(
 
         return null
     }
-
-    // ======================== Insertion Logic ========================
-
+    
     /**
      * Inserts a key-value pair into the tree
      */
@@ -99,8 +93,6 @@ class BSTree<K : Comparable<K>, V> private constructor(
 
         return node
     }
-
-    // ======================== Deletion Logic ========================
 
     /**
      * Removes a key from the tree
@@ -153,8 +145,6 @@ class BSTree<K : Comparable<K>, V> private constructor(
 
         return current
     }
-
-    // ======================== Iterator ========================
 
     /**
      * Returns an iterator for traversing the tree in Inorder (left -> root -> right)
