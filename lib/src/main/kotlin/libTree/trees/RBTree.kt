@@ -1,6 +1,6 @@
-package LibTree.trees
+package libTree.trees
 
-import LibTree.interfaceTree.Tree
+import libTree.interfaceTree.Tree
 import kotlin.math.max
 /*
 инварианты кч:
