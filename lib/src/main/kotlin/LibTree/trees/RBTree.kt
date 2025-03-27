@@ -6,13 +6,13 @@ import kotlin.math.max
 инварианты кч:
     1) каждый узел - красный или черный
     2) корень и листья - черные
-    3) у каждого узла родительский узел - черный
+    3) у каждого красного узла родительский узел - черный
     4) все пути из узла содержат одинаковое количество черных узлов
     5) черный узел может иметь черного родителя
  */
 class RBTree<K : Comparable<K>,V>(
     private var root : RBNode<K,V>? = null,
-) : Tree<K,V, RBTree<K, V>> {
+) : Tree<K,V, RBTree.RBNode<K, V>> {
 
     enum class Color {
         RED,
@@ -22,11 +22,11 @@ class RBTree<K : Comparable<K>,V>(
     class RBNode<K : Comparable<K>, V>(
         key: K,
         value: V,
-        override var left: BaseNode<K, V>? = null,
-        override var right: BaseNode<K, V>? = null,
-        override var height: Long = 1,
+        public override var left: RBNode<K, V>? = null,
+        public override var right: RBNode<K, V>? = null,
+        public override var height: Long = 1,
         var color: Color = Color.RED,
-        private var parent: RBNode<K, V>? = null
+        public var parent: RBNode<K, V>? = null
     ) : BaseNode<K, V, RBNode<K, V>>(key, value, left, right, height)
 
     // вставка элемента
@@ -38,9 +38,9 @@ class RBTree<K : Comparable<K>,V>(
         while (x != null) { // ищем место для вставки нового узла
             y = x
             if (newNode.key < x.key) {
-                x = x.left as? RBNode<K, V>
+                x = x.left 
             } else {
-                x = x.right as? RBNode<K, V>
+                x = x.right 
             }
         }
 
@@ -55,42 +55,42 @@ class RBTree<K : Comparable<K>,V>(
 
     // балансировка дерева после вставки элемента
     private fun fixInsertion(current : RBNode<K, V>) {
-        var node = current
+        var node= current
         while (node.parent?.color == Color.RED) { // нарушено 3 свойство
             if (node.parent == node.parent?.parent?.left) { // если родитель узла находится слева
                 // от дедушки узла
-                val uncle = node.parent?.parent?.right as? RBNode<K, V>
+                val uncle = node.parent?.parent?.right 
                 if (uncle?.color == Color.RED) { // дядя красный => меняем дяде и родителю узла
                     // цвета на черный, а деду - на красный
                     node.parent?.color = Color.BLACK
                     uncle.color = Color.BLACK
                     node.parent?.parent?.color = Color.RED
-                    node = node.parent?.parent // возможно поломали инварианты => цикл от деда узла
+                    node = node.parent?.parent!! // возможно поломали инварианты => цикл от деда узла
                 } else { // дядя черный
                     if (node == node.parent?.right) { // узел правый потомок => делаем левым
-                        node = node.parent
+                        node = node.parent!!
                         rotateLeft(node)
                     }
                     node.parent?.color = Color.BLACK
                     node.parent?.parent?.color = Color.RED
-                    rotateRight(node.parent?.parent)
+                    rotateRight(node.parent?.parent!!) 
                 }
             } else {// если родитель узла находится справа от дедушки узла,
                 // делаем все аналогично
-                val uncle = node.parent?.parent?.left as? RBNode<K, V>
+                val uncle = node.parent?.parent?.left 
                 if (uncle?.color == Color.RED) {
                     node.parent?.color = Color.BLACK
                     uncle.color = Color.BLACK
                     node.parent?.parent?.color = Color.RED
-                    node = node.parent?.parent
+                    node = node.parent?.parent!!
                 } else {
                     if (node == node.parent?.left) {
-                        node = node.parent
+                        node = node.parent!!
                         rotateRight(node)
                     }
                     node.parent?.color = Color.BLACK
                     node.parent?.parent?.color = Color.RED
-                    rotateLeft(node.parent?.parent)
+                    rotateLeft(node.parent?.parent!!)
                 }
             }
         }
@@ -104,27 +104,27 @@ class RBTree<K : Comparable<K>,V>(
         var x : RBNode<K,V>? = null
 
         if (z.left == null) {
-            x = z.right as? RBNode<K,V>
-            transplant(z, z.right as? RBNode<K,V>)
+            x = z.right 
+            transplant(z, z.right )
         } else if (z.right == null) {
-            x = z.left as? RBNode<K,V>
-            transplant(z, z.left as? RBNode<K,V>)
+            x = z.left 
+            transplant(z, z.left )
         } else {
             y = minimum(z.right as RBNode<K,V>)
             yOriginalColor = y.color
-            x = y.right as? RBNode<K,V>
+            x = y.right 
             if (y.parent == z) {
                 if (x != null) {
                     x.parent = y
                 }
             } else {
-                transplant(y, y.right as? RBNode<K,V>)
+                transplant(y, y.right )
                 y.right = z.right
-                (y.right as? RBNode<K,V>)?.parent = y
+                (y.right )?.parent = y
             }
             transplant(z, y)
             y.left = z.left
-            (y.left as? RBNode<K,V>)?.parent = y
+            (y.left )?.parent = y
         }
         if (yOriginalColor == Color.BLACK && x != null) {
             fixDeletion(x)
@@ -153,7 +153,7 @@ class RBTree<K : Comparable<K>,V>(
     }
     // поворот влево относительно узла x
     private fun rotateLeft(x: RBNode<K, V>) {
-        val y = x.right as? RBNode<K, V> ?: return
+        val y = x.right  ?: return
         x.right = y.left
         if (y.left != null) {
             (y.left as RBNode<K, V>).parent = x
@@ -171,7 +171,7 @@ class RBTree<K : Comparable<K>,V>(
     }
     // поворот вправо относительно узла x, аналогично rotateLeft
     private fun rotateRight(x: RBNode<K, V>) {
-        val y = x.left as? RBNode<K, V> ?: return
+        val y = x.left  ?: return
         x.left = y.right
         if (y.right != null) {
             (y.right as RBNode<K, V>).parent = x
@@ -188,62 +188,90 @@ class RBTree<K : Comparable<K>,V>(
         x.parent = y
     }
     // перекраска узлов после удаления элемента
-    private fun fixDeletion(x : RBNode<K,V>) {
+    private fun fixDeletion(x: RBNode<K, V>) {
         var node = x
         while (node != root && node.color == Color.BLACK) {
-            if (node == node.parent?.left) {
-                var w = node.parent?.right as? RBNode<K,V>
-                if (w?.color == Color.RED) {
+            if (node.parent != null && node == node.parent!!.left) {
+                var w = node.parent!!.right 
+                if (w != null && w.color == Color.RED) {
+                    // cлучай 1 брат узла красный
                     w.color = Color.BLACK
-                    node.parent?.color = Color.RED
-                    rotateLeft(node.parent)
-                    w = node.parent?.right as? RBNode<K,V>
+                    node.parent!!.color = Color.RED
+                    rotateLeft(node.parent!!)
+                    w = node.parent!!.right 
                 }
-                if ((w?.left == null || (w.left as RBNode<K,V>).color == Color.BLACK) &&
-                    (w?.right == null || (w.right as RBNode<K,V>).color == Color.BLACK) {
-                        (w?.left as? RBNode<K,V>)?.color = Color.BLACK
-                        w?.color = Color.RED
-                        node = node.parent
-                    } else {
-                    if (w?.right == null || (w.right as RBNode<K,V>).color == Color.BLACK) {
-                        (w?.left as? RBNode<K,V>)?.color = Color.BLACK
-                        w?.color = Color.RED
+                if (w == null ||
+                    (((w.left )?.color ?: Color.BLACK) == Color.BLACK &&
+                            ((w.right )?.color ?: Color.BLACK) == Color.BLACK)
+                ) {
+                    // cлучай 2 брат черный, оба его потомка черные
+                    w?.color = Color.RED
+                    node = node.parent!!
+                } else {
+                    if (((w.right )?.color ?: Color.BLACK) == Color.BLACK) {
+                        // cлучай 3 брат черный, левый потомок красный, правый черный
+                        (w.left )?.color = Color.BLACK
+                        w.color = Color.RED
                         rotateRight(w)
-                        w = node.parent?.right as? RBNode<K,V>
+                        w = node.parent!!.right 
                     }
-                    w?.color = node.parent?.color ?: Color.BLACK
-                    node.parent?.color = Color.BLACK
-                    (w?.color as? RBNode<K,V>)?.color = Color.BLACK
-                    rotateLeft(node.parent)
-                    node = root
+                    // cлучай 4 брат черный, правый потомок красный
+                    w?.color = node.parent!!.color
+                    node.parent!!.color = Color.BLACK
+                    (w?.right )?.color = Color.BLACK
+                    rotateLeft(node.parent!!)
+                    node = root!!
+                }
+            } else if (node.parent != null) {
+                var w = node.parent!!.left 
+                if (w != null && w.color == Color.RED) {
+                    // cимметричные случаи
+                    w.color = Color.BLACK
+                    node.parent!!.color = Color.RED
+                    rotateRight(node.parent!!)
+                    w = node.parent!!.left 
+                }
+                if (w == null ||
+                    (((w.left )?.color ?: Color.BLACK) == Color.BLACK &&
+                            ((w.right )?.color ?: Color.BLACK) == Color.BLACK)
+                ) {
+
+                    w?.color = Color.RED
+                    node = node.parent!!
+                } else {
+                    if (((w.left )?.color ?: Color.BLACK) == Color.BLACK) {
+
+                        (w.right )?.color = Color.BLACK
+                        w.color = Color.RED
+                        rotateLeft(w)
+                        w = node.parent!!.left 
+                    }
+
+                    w?.color = node.parent!!.color
+                    node.parent!!.color = Color.BLACK
+                    (w?.left )?.color = Color.BLACK
+                    rotateRight(node.parent!!)
+                    node = root!!
                 }
             } else {
-                var w = node.parent?.left as? RBNode<K,V>
-                if (w?.color == Color.RED) {
-                    w.color = Color.BLACK
-                    node.parent?.color = Color.RED
-                    rotateRight(node.parent)
-                    w = node.parent?.left as? RBNode<K,V>
-                }
-                w?.color = node.parent?.color ?: Color.BLACK
-                node.parent?.color = Color.BLACK
-                (w?.left as? RBNode<K,V>)?.color = Color.BLACK
-                rotateRight(node.parent)
-                node = root
+                break
             }
         }
-        node.parent = Color.BLACK
+        node.color = Color.BLACK
     }
 
-    override fun height(): Long = height(root)
-
+    override fun height(): Int = height(root)
+   
+    
     // рекурсивный поиск высоты
-    private fun height(node: BaseNode<K, V>?): Long =
+    private fun height(node: RBNode<K, V>?): Int {
+
         if (node == null) {
             return 0
         } else {
             return (1 + max(height(node.left), height(node.right)))
         }
+    }
 
     // очистка дерева
     override fun clean() {
@@ -254,8 +282,8 @@ class RBTree<K : Comparable<K>,V>(
         var current = root
         while (current != null) {
             current = when {
-                key < current.key -> current.left as? RBNode<K, V>
-                key > current.key -> current.right as? RBNode<K, V>
+                key < current.key -> current.left 
+                key > current.key -> current.right 
                 else -> return current
             }
         }
@@ -270,7 +298,7 @@ class RBTree<K : Comparable<K>,V>(
     //рекурсивный обход дерева
     override fun iterator(): Iterator<Pair<K, V>> {
         val list = mutableListOf<Pair<K, V>>()
-        fun Order(node: BaseNode<K, V>?) {
+        fun Order(node: RBNode<K, V>?) {
             if (node == null) return
             list.add(Pair(node.key, node.value))
             Order(node.left)
