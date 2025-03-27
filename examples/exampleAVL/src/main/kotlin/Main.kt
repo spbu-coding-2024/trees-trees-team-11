@@ -27,6 +27,6 @@ fun main() {
 
     //iterating in preOrder
     for(node in tree) {
-        print(node)
+        print("${node}\n")
     }
 }
