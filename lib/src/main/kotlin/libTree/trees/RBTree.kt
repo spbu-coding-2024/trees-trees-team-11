@@ -10,7 +10,7 @@ import kotlin.math.max
     4) все пути из узла содержат одинаковое количество черных узлов
     5) черный узел может иметь черного родителя
  */
-class RBTree<K : Comparable<K>,V>(
+class RBTree<K : Comparable<K>,V> private constructor(
     private var root : RBNode<K,V>? = null,
 ) : Tree<K,V, RBTree.RBNode<K, V>> {
 
@@ -29,6 +29,7 @@ class RBTree<K : Comparable<K>,V>(
         public var parent: RBNode<K, V>? = null
     ) : BaseNode<K, V, RBNode<K, V>>(key, value, left, right, height)
 
+    constructor() : this(null)
     // вставка элемента
     override fun insert(key: K, value: V) {
         val newNode = RBNode(key, value)
