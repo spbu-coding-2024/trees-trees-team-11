@@ -1,13 +1,13 @@
 import libTree.trees.BSTree
 
 fun main() {
-    //create AVLTree object
+    //create BSTree object
     val tree = BSTree<Int,Int>()
 
-    //inserting node in AVLTree
+    //inserting node in BSTree
     tree.insert(4,4)
 
-    //erasing node from AVLTree
+    //erasing node from BSTree
     tree.erase(4)
 
     //clean tree
@@ -18,10 +18,10 @@ fun main() {
     tree.insert(10,9)
     tree.insert(11,9)
     tree.insert(12,9)
-    //checking height of AVLTree
+    //checking height of BSTree
     tree.height()
 
-    //checking for contains key in AVLTree
+    //checking for contains key in BSTree
     tree.containsKey(11)
     tree.containsKey(0)
 
