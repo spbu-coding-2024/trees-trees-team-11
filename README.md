@@ -41,6 +41,13 @@ Execute demos for each tree type using the following commands:
 
 ## 📚 Usage Guide
 
+
+## 🌲 Supported Tree Structures
+- ✅ **AVL Trees**
+- ✅ **Red-Black (RB) Trees**
+- ✅ **Binary Search Trees (BST)**
+
+
 To use the library, instantiate objects of supported tree types as shown below:
 
 ```kotlin
@@ -59,13 +66,6 @@ val bsTree = BSTree<YourKeyType, YourValueType>()
 - **`insert(key, value)`** — Inserts a key-value pair into the tree
 - **`erase(key)`** — Removes a node by key
 - **`clean()`** — Clears the entire tree
-
----
-
-## 🌲 Supported Tree Structures
-- ✅ **AVL Trees**
-- ✅ **Red-Black (RB) Trees**
-- ✅ **Binary Search Trees (BST)**
 
 ---
 
