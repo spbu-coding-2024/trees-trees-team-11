@@ -45,12 +45,16 @@ To use the library, instantiate objects of supported tree types as shown below:
 
 ```kotlin
 val avlTree = AVLTree<YourKeyType, YourValueType>()
+```
+```kotlin
 val rbTree = RBTree<YourKeyType, YourValueType>()
+```
+```kotlin
 val bsTree = BSTree<YourKeyType, YourValueType>()
 ```
 
 ### Supported Operations
-- **`height`** — Returns the height of the tree
+- **`height()`** — Returns the height of the tree
 - **`containsKey(key)`** — Checks if the tree contains a specific key
 - **`insert(key, value)`** — Inserts a key-value pair into the tree
 - **`erase(key)`** — Removes a node by key
