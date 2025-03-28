@@ -22,11 +22,11 @@ class RBTree<K : Comparable<K>,V> private constructor(
     class RBNode<K : Comparable<K>, V>(
         key: K,
         value: V,
-        public override var left: RBNode<K, V>? = null,
-        public override var right: RBNode<K, V>? = null,
-        public override var height: Long = 1,
+        override var left: RBNode<K, V>? = null,
+        override var right: RBNode<K, V>? = null,
+        override var height: Long = 1,
         var color: Color = Color.RED,
-        public var parent: RBNode<K, V>? = null
+        internal var parent: RBNode<K, V>? = null
     ) : BaseNode<K, V, RBNode<K, V>>(key, value, left, right, height)
 
     constructor() : this(null)

@@ -12,9 +12,9 @@ class BSTree<K : Comparable<K>, V> private constructor(
     class BSNode<K : Comparable<K>, V>(
         key: K,
         value: V,
-        public override var left: BSNode<K, V>? = null,
-        public override var right: BSNode<K, V>? = null,
-        public override var height: Long = 1,
+        override var left: BSNode<K, V>? = null,
+        override var right: BSNode<K, V>? = null,
+        override var height: Long = 1,
     ) : BaseNode<K, V, BSNode<K, V>>(key, value, left, right, height)
 
     constructor() : this(null)

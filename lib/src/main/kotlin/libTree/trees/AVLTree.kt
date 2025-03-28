@@ -21,12 +21,12 @@ class AVLTree<K : Comparable<K>, V> private constructor (
      * @property right Right child node
      * @property height Height of the node in the tree
      */
-    class AVLNode<K : Comparable<K>, V>(
+    class AVLNode<K : Comparable<K>, V> internal constructor (
         key: K,
         value: V,
-        public override var left: AVLNode<K, V>? = null,
-        public override var right: AVLNode<K, V>? = null,
-        public override var height: Long = 1
+        override var left: AVLNode<K, V>? = null,
+        override var right: AVLNode<K, V>? = null,
+        override var height: Long = 1
     ) : BaseNode<K, V, AVLNode<K, V>>(key, value, left, right, height)
 
     /**
