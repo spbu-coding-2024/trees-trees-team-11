@@ -11,6 +11,14 @@ A simple, efficient, and user-friendly library for working with various balanced
 
 ---
 
+
+## 🌲 Supported Tree Structures
+- ✅ **AVL Trees**
+- ✅ **Red-Black (RB) Trees**
+- ✅ **Binary Search Trees (BST)**
+
+---
+
 ## 🚀 Quick Start
 
 ### Clone Repository
@@ -40,13 +48,6 @@ Execute demos for each tree type using the following commands:
 ---
 
 ## 📚 Usage Guide
-
-
-## 🌲 Supported Tree Structures
-- ✅ **AVL Trees**
-- ✅ **Red-Black (RB) Trees**
-- ✅ **Binary Search Trees (BST)**
-
 
 To use the library, instantiate objects of supported tree types as shown below:
 
