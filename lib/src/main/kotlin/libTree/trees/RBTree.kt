@@ -2,24 +2,43 @@ package libTree.trees
 
 import libTree.interfaceTree.Tree
 import kotlin.math.max
+
 /*
-инварианты кч:
-    1) каждый узел - красный или черный
-    2) корень и листья - черные
-    3) у каждого красного узла родительский узел - черный
-    4) все пути из узла содержат одинаковое количество черных узлов
-    5) черный узел может иметь черного родителя
+ * Implementation of an Red Black Tree, a self-balancing binary search tree.
+ *
+ * @param K the type of keys maintained by this tree, must be Comparable
+ * @param V the type of mapped values
+ *
+
+ * Invariants of red black tree:
+ *   1) each node is red or black
+ *   2) the root and leaves are black
+ *   3) each red node has a black parent
+ *   4) all paths from a node contain the same number of black nodes
+ *   5) a black node can have a black parent
  */
+
 class RBTree<K : Comparable<K>,V> private constructor(
     private var root : RBNode<K,V>? = null,
 ) : Tree<K,V, RBTree.RBNode<K, V>> {
+
+   
+     /**
+     * Node class representing each node in the Red Black Tree.
+     *
+     * @param K the type of keys
+     * @param V the type of values
+     * @property left - Left child node
+     * @property right - Right child node
+     * @property height Height of the node in the tree
+     * @property parent - Parent of the node
+     */
 
     enum class Color {
         RED,
         BLACK,
     }
-    // узел КЧ дерева
-    class RBNode<K : Comparable<K>, V>(
+    class RBNode<K : Comparable<K>, V> internal constructor (
         key: K,
         value: V,
         override var left: RBNode<K, V>? = null,
@@ -29,14 +48,42 @@ class RBTree<K : Comparable<K>,V> private constructor(
         internal var parent: RBNode<K, V>? = null
     ) : BaseNode<K, V, RBNode<K, V>>(key, value, left, right, height)
 
+     /**
+     * Secondary constructor initializing an empty Red Black Tree Tree.
+     */
     constructor() : this(null)
-    // вставка элемента
+
+    /**
+     * Calculates the height of the Red Black Tree.
+     *
+     * @return Height of the tree
+     */
+    override fun height(): Int {
+        return height(root)
+    } 
+
+    /*
+     * Checks whether the RBTree contains a node with the given key.
+     *
+     * @param key Key to search for
+     * @return True if the tree contains the key, false otherwise
+     */
+    override fun containsKey(key: K): Boolean {
+        return findNode(key) != null
+    }
+    
+     /**
+     * Inserts a node into the RBTree with the given key and value.
+     *
+     * @param key Key for the node
+     * @param value Value for the node
+     */
     override fun insert(key: K, value: V) {
         val newNode = RBNode(key, value)
         var y: RBNode<K, V>? = null
         var x = root
 
-        while (x != null) { // ищем место для вставки нового узла
+        while (x != null) { // Looking for a place to insert a new node
             y = x
             if (newNode.key < x.key) {
                 x = x.left 
@@ -47,57 +94,18 @@ class RBTree<K : Comparable<K>,V> private constructor(
 
         newNode.parent = y
         when {
-            y == null -> root = newNode // в дереве не было узлов
+            y == null -> root = newNode // There were no nodes in the tree
             newNode.key < y.key -> y.left = newNode
             else -> y.right = newNode
         }
-        fixInsertion(newNode) // фиксим цвета после вставки
+        fixInsertion(newNode) // Fix colors after insertion
     }
 
-    // балансировка дерева после вставки элемента
-    private fun fixInsertion(current : RBNode<K, V>) {
-        var node= current
-        while (node.parent?.color == Color.RED) { // нарушено 3 свойство
-            if (node.parent == node.parent?.parent?.left) { // если родитель узла находится слева
-                // от дедушки узла
-                val uncle = node.parent?.parent?.right 
-                if (uncle?.color == Color.RED) { // дядя красный => меняем дяде и родителю узла
-                    // цвета на черный, а деду - на красный
-                    node.parent?.color = Color.BLACK
-                    uncle.color = Color.BLACK
-                    node.parent?.parent?.color = Color.RED
-                    node = node.parent?.parent!! // возможно поломали инварианты => цикл от деда узла
-                } else { // дядя черный
-                    if (node == node.parent?.right) { // узел правый потомок => делаем левым
-                        node = node.parent!!
-                        rotateLeft(node)
-                    }
-                    node.parent?.color = Color.BLACK
-                    node.parent?.parent?.color = Color.RED
-                    rotateRight(node.parent?.parent!!) 
-                }
-            } else {// если родитель узла находится справа от дедушки узла,
-                // делаем все аналогично
-                val uncle = node.parent?.parent?.left 
-                if (uncle?.color == Color.RED) {
-                    node.parent?.color = Color.BLACK
-                    uncle.color = Color.BLACK
-                    node.parent?.parent?.color = Color.RED
-                    node = node.parent?.parent!!
-                } else {
-                    if (node == node.parent?.left) {
-                        node = node.parent!!
-                        rotateRight(node)
-                    }
-                    node.parent?.color = Color.BLACK
-                    node.parent?.parent?.color = Color.RED
-                    rotateLeft(node.parent?.parent!!)
-                }
-            }
-        }
-        root?.color = Color.BLACK // делаем корень черным
-    }
-    // удаление элемента по ключу
+    /*
+     * Delets a node into the RBTree with the given key.
+     *
+     * @param key Key for the node
+     */
     override fun erase(key: K) {
         val z = findNode(key) ?: return
         var y = z
@@ -131,7 +139,81 @@ class RBTree<K : Comparable<K>,V> private constructor(
             fixDeletion(x)
         }
     }
-    // замена поддерева, корень которого u, поддеревом vя
+
+    // --- Private helper methods for RBTree operations ---
+
+    /*
+     * Search element by key (for containsKey)
+     * 
+     * @param key Key to search for
+     * @return Node if the tree contains the key, null otherwise
+     */
+    private fun findNode(key: K): RBNode<K, V>? {
+        var current = root
+        while (current != null) {
+            current = when {
+                key < current.key -> current.left 
+                key > current.key -> current.right 
+                else -> return current
+            }
+        }
+        return null
+    }
+
+    /* 
+     * Tree balancing after inserting an element
+     * 
+     * @param current - Node of the RBTree
+     */
+    private fun fixInsertion(current : RBNode<K, V>) {
+        var node= current
+        while (node.parent?.color == Color.RED) { // Property 3 is violated
+            if (node.parent == node.parent?.parent?.left) { // If the node's parent is on the left
+                // From the grandfather of the node
+                val uncle = node.parent?.parent?.right 
+                if (uncle?.color == Color.RED) { // Uncle red => change uncle and parent of node
+                    // Colors to black, and grandfather to red
+                    node.parent?.color = Color.BLACK
+                    uncle.color = Color.BLACK
+                    node.parent?.parent?.color = Color.RED
+                    node = node.parent?.parent!! // Maybe broke invariants => cycle from node's grandfather
+                } else { // Uncle black
+                    if (node == node.parent?.right) { // Node right descendant => make left
+                        node = node.parent!!
+                        rotateLeft(node)
+                    }
+                    node.parent?.color = Color.BLACK
+                    node.parent?.parent?.color = Color.RED
+                    rotateRight(node.parent?.parent!!) 
+                }
+            } else { // If the node's parent is to the right of the node's grandparent,
+            // do everything similarly
+                val uncle = node.parent?.parent?.left 
+                if (uncle?.color == Color.RED) {
+                    node.parent?.color = Color.BLACK
+                    uncle.color = Color.BLACK
+                    node.parent?.parent?.color = Color.RED
+                    node = node.parent?.parent!!
+                } else {
+                    if (node == node.parent?.left) {
+                        node = node.parent!!
+                        rotateRight(node)
+                    }
+                    node.parent?.color = Color.BLACK
+                    node.parent?.parent?.color = Color.RED
+                    rotateLeft(node.parent?.parent!!)
+                }
+            }
+        }
+        root?.color = Color.BLACK // Make the root black
+    }
+    
+    /* 
+     *   Replacing a subtree whose root is u with a subtree v (For erase)
+     * 
+     *   @param u - Node of the RBTree
+     *   @param v - Node of the RBTree
+    */
     private fun transplant(u: RBNode<K, V>, v: RBNode<K, V>?) {
         if (u.parent == null) {
             root = v
@@ -144,7 +226,10 @@ class RBTree<K : Comparable<K>,V> private constructor(
             v.parent = u.parent
         }
     }
-    // для поиска минимального элемента в дереве
+
+    /**
+     * Finds the node with the minimum key starting from a given node.
+     */
     private fun minimum(node : RBNode<K, V>) : RBNode<K, V> {
         var current = node
         while (current.left != null) {
@@ -152,7 +237,10 @@ class RBTree<K : Comparable<K>,V> private constructor(
         }
         return current
     }
-    // поворот влево относительно узла x
+
+    /**
+     * Performs a left rotation around a given node.
+     */
     private fun rotateLeft(x: RBNode<K, V>) {
         val y = x.right  ?: return
         x.right = y.left
@@ -160,9 +248,9 @@ class RBTree<K : Comparable<K>,V> private constructor(
             (y.left as RBNode<K, V>).parent = x
         }
         y.parent = x.parent
-        if (x.parent == null) { // нечего поворачивать
+        if (x.parent == null) { // Nothing to turn
             root = y
-        } else if (x == x.parent?.left) { // узел слава от родителя
+        } else if (x == x.parent?.left) { // Node glory from parent
             x.parent?.left = y
         } else {
             x.parent?.right = y
@@ -170,7 +258,10 @@ class RBTree<K : Comparable<K>,V> private constructor(
         y.left = x
         x.parent = y
     }
-    // поворот вправо относительно узла x, аналогично rotateLeft
+
+    /**
+     * Performs a right rotation around a given node.
+     */
     private fun rotateRight(x: RBNode<K, V>) {
         val y = x.left  ?: return
         x.left = y.right
@@ -188,14 +279,19 @@ class RBTree<K : Comparable<K>,V> private constructor(
         y.right = x
         x.parent = y
     }
-    // перекраска узлов после удаления элемента
+
+     /* 
+     * Tree balancing after deletion an element
+     * 
+     * @param current - Node of the RBTree
+     */
     private fun fixDeletion(x: RBNode<K, V>) {
         var node = x
         while (node != root && node.color == Color.BLACK) {
             if (node.parent != null && node == node.parent!!.left) {
                 var w = node.parent!!.right 
                 if (w != null && w.color == Color.RED) {
-                    // cлучай 1 брат узла красный
+                    // Case 1 brother of the node is red
                     w.color = Color.BLACK
                     node.parent!!.color = Color.RED
                     rotateLeft(node.parent!!)
@@ -205,18 +301,18 @@ class RBTree<K : Comparable<K>,V> private constructor(
                     (((w.left )?.color ?: Color.BLACK) == Color.BLACK &&
                             ((w.right )?.color ?: Color.BLACK) == Color.BLACK)
                 ) {
-                    // cлучай 2 брат черный, оба его потомка черные
+                    // Case 2 brother is black, both his descendants are black
                     w?.color = Color.RED
                     node = node.parent!!
                 } else {
                     if (((w.right )?.color ?: Color.BLACK) == Color.BLACK) {
-                        // cлучай 3 брат черный, левый потомок красный, правый черный
+                        // Case 3 brother black, left descendant red, right black
                         (w.left )?.color = Color.BLACK
                         w.color = Color.RED
                         rotateRight(w)
                         w = node.parent!!.right 
                     }
-                    // cлучай 4 брат черный, правый потомок красный
+                    // Case 4 brother black, right descendant red
                     w?.color = node.parent!!.color
                     node.parent!!.color = Color.BLACK
                     (w?.right )?.color = Color.BLACK
@@ -226,7 +322,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
             } else if (node.parent != null) {
                 var w = node.parent!!.left 
                 if (w != null && w.color == Color.RED) {
-                    // cимметричные случаи
+                    // Symmetrical cases
                     w.color = Color.BLACK
                     node.parent!!.color = Color.RED
                     rotateRight(node.parent!!)
@@ -261,10 +357,11 @@ class RBTree<K : Comparable<K>,V> private constructor(
         node.color = Color.BLACK
     }
 
-    override fun height(): Int = height(root)
-   
-    
-    // рекурсивный поиск высоты
+    /*
+        Recursive height search
+
+        @return Height of the tree
+    */
     private fun height(node: RBNode<K, V>?): Int {
 
         if (node == null) {
@@ -274,29 +371,19 @@ class RBTree<K : Comparable<K>,V> private constructor(
         }
     }
 
-    // очистка дерева
+    /*
+        Cleaning of a tree
+    */
     override fun clean() {
         root = null
     }
-    // поиск элемента по ключу
-    private fun findNode(key: K): RBNode<K, V>? {
-        var current = root
-        while (current != null) {
-            current = when {
-                key < current.key -> current.left 
-                key > current.key -> current.right 
-                else -> return current
-            }
-        }
-        return null
-    }
-
-    // использует findNode
-    override fun containsKey(key: K): Boolean {
-        return findNode(key) != null
-    }
-
-    //рекурсивный обход дерева
+    
+    
+    /**
+     * Returns an iterator to traverse the RBTree.
+     *
+     * @return Iterator of key-value pairs
+     */
     override fun iterator(): Iterator<Pair<K, V>> {
         val list = mutableListOf<Pair<K, V>>()
         fun Order(node: RBNode<K, V>?) {
