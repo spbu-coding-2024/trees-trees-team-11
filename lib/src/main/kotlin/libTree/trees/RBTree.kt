@@ -165,43 +165,46 @@ class RBTree<K : Comparable<K>,V> private constructor(
      * 
      * @param current - Node of the RBTree
      */
-    private fun fixInsertion(current : RBNode<K, V>) {
-        var node= current
-        while (node.parent?.color == Color.RED) { // Property 3 is violated
-            if (node.parent == node.parent?.parent?.left) { // If the node's parent is on the left
+    private fun fixInsertion(current: RBNode<K, V>) {
+        var node = current
+        while (node.parent != null && node.parent!!.color == Color.RED) { // Property 3 is violated
+            //  using !! is okay, because we have already checked != null
+            val parent = node.parent
+            val grandparent = parent?.parent ?: break
+            if (parent == grandparent.left) { // If the node's parent is on the left
                 // From the grandfather of the node
-                val uncle = node.parent?.parent?.right 
-                if (uncle?.color == Color.RED) { // Uncle red => change uncle and parent of node
+                val uncle = grandparent.right
+                if (uncle != null && uncle.color == Color.RED) { // Uncle red => change uncle and parent of node
                     // Colors to black, and grandfather to red
-                    node.parent?.color = Color.BLACK
+                    parent.color = Color.BLACK
                     uncle.color = Color.BLACK
-                    node.parent?.parent?.color = Color.RED
-                    node = node.parent?.parent!! // Maybe broke invariants => cycle from node's grandfather
-                } else { // Uncle black
-                    if (node == node.parent?.right) { // Node right descendant => make left
-                        node = node.parent!!
+                    grandparent.color = Color.RED
+                    node = grandparent  // Maybe broke invariants => cycle from node's grandfather
+                } else {  // Uncle black
+                    if (node == parent.right) { // Node right descendant => make left
+                        node = parent
                         rotateLeft(node)
                     }
-                    node.parent?.color = Color.BLACK
-                    node.parent?.parent?.color = Color.RED
-                    rotateRight(node.parent?.parent!!) 
+                    parent.color = Color.BLACK
+                    grandparent.color = Color.RED
+                    rotateRight(grandparent)
                 }
             } else { // If the node's parent is to the right of the node's grandparent,
             // do everything similarly
-                val uncle = node.parent?.parent?.left 
-                if (uncle?.color == Color.RED) {
-                    node.parent?.color = Color.BLACK
+                val uncle = grandparent.left
+                if (uncle != null && uncle.color == Color.RED) {
+                    parent.color = Color.BLACK
                     uncle.color = Color.BLACK
-                    node.parent?.parent?.color = Color.RED
-                    node = node.parent?.parent!!
+                    grandparent.color = Color.RED
+                    node = grandparent
                 } else {
-                    if (node == node.parent?.left) {
-                        node = node.parent!!
+                    if (node == parent.left) {
+                        node = parent
                         rotateRight(node)
                     }
-                    node.parent?.color = Color.BLACK
-                    node.parent?.parent?.color = Color.RED
-                    rotateLeft(node.parent?.parent!!)
+                    parent.color = Color.BLACK
+                    grandparent.color = Color.RED
+                    rotateLeft(grandparent)
                 }
             }
         }
@@ -238,7 +241,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
         return current
     }
 
-    /**
+    /*
      * Performs a left rotation around a given node.
      */
     private fun rotateLeft(x: RBNode<K, V>) {
@@ -259,7 +262,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
         x.parent = y
     }
 
-    /**
+    /*
      * Performs a right rotation around a given node.
      */
     private fun rotateRight(x: RBNode<K, V>) {
@@ -280,7 +283,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
         x.parent = y
     }
 
-     /* 
+    /* 
      * Tree balancing after deletion an element
      * 
      * @param current - Node of the RBTree
@@ -288,79 +291,72 @@ class RBTree<K : Comparable<K>,V> private constructor(
     private fun fixDeletion(x: RBNode<K, V>) {
         var node = x
         while (node != root && node.color == Color.BLACK) {
-            if (node.parent != null && node == node.parent!!.left) {
-                var w = node.parent!!.right 
+            val parent = node.parent ?: break
+            if (node == parent.left) {
+                var w = parent.right
                 if (w != null && w.color == Color.RED) {
                     // Case 1 brother of the node is red
                     w.color = Color.BLACK
-                    node.parent!!.color = Color.RED
-                    rotateLeft(node.parent!!)
-                    w = node.parent!!.right 
+                    parent.color = Color.RED
+                    rotateLeft(parent)
+                    w = parent.right
                 }
-                if (w == null ||
-                    (((w.left )?.color ?: Color.BLACK) == Color.BLACK &&
-                            ((w.right )?.color ?: Color.BLACK) == Color.BLACK)
-                ) {
-                    // Case 2 brother is black, both his descendants are black
+                if (w == null || ((w.left?.color ?: Color.BLACK) == Color.BLACK &&
+                                  (w.right?.color ?: Color.BLACK) == Color.BLACK)) {
+                     // Case 2 brother is black, both his descendants are black               
                     w?.color = Color.RED
-                    node = node.parent!!
+                    node = parent
                 } else {
-                    if (((w.right )?.color ?: Color.BLACK) == Color.BLACK) {
-                        // Case 3 brother black, left descendant red, right black
-                        (w.left )?.color = Color.BLACK
+                     // Case 3 brother black, left descendant red, right black
+                    if ((w.right?.color ?: Color.BLACK) == Color.BLACK) {
+                        w.left?.color = Color.BLACK
                         w.color = Color.RED
                         rotateRight(w)
-                        w = node.parent!!.right 
+                        w = parent.right
                     }
                     // Case 4 brother black, right descendant red
-                    w?.color = node.parent!!.color
-                    node.parent!!.color = Color.BLACK
-                    (w?.right )?.color = Color.BLACK
-                    rotateLeft(node.parent!!)
-                    node = root!!
-                }
-            } else if (node.parent != null) {
-                var w = node.parent!!.left 
-                if (w != null && w.color == Color.RED) {
-                    // Symmetrical cases
-                    w.color = Color.BLACK
-                    node.parent!!.color = Color.RED
-                    rotateRight(node.parent!!)
-                    w = node.parent!!.left 
-                }
-                if (w == null ||
-                    (((w.left )?.color ?: Color.BLACK) == Color.BLACK &&
-                            ((w.right )?.color ?: Color.BLACK) == Color.BLACK)
-                ) {
-
-                    w?.color = Color.RED
-                    node = node.parent!!
-                } else {
-                    if (((w.left )?.color ?: Color.BLACK) == Color.BLACK) {
-
-                        (w.right )?.color = Color.BLACK
-                        w.color = Color.RED
-                        rotateLeft(w)
-                        w = node.parent!!.left 
-                    }
-
-                    w?.color = node.parent!!.color
-                    node.parent!!.color = Color.BLACK
-                    (w?.left )?.color = Color.BLACK
-                    rotateRight(node.parent!!)
-                    node = root!!
+                    w?.color = parent.color
+                    parent.color = Color.BLACK
+                    w?.right?.color = Color.BLACK
+                    rotateLeft(parent)
+                    node = root ?: break
                 }
             } else {
-                break
+                var w = parent.left
+                // Symmetrical cases
+                if (w != null && w.color == Color.RED) {
+                    w.color = Color.BLACK
+                    parent.color = Color.RED
+                    rotateRight(parent)
+                    w = parent.left
+                }
+                if (w == null || ((w.left?.color ?: Color.BLACK) == Color.BLACK &&
+                                  (w.right?.color ?: Color.BLACK) == Color.BLACK)) {
+                    w?.color = Color.RED
+                    node = parent
+                } else {
+                    if ((w.left?.color ?: Color.BLACK) == Color.BLACK) {
+                        w.right?.color = Color.BLACK
+                        w.color = Color.RED
+                        rotateLeft(w)
+                        w = parent.left
+                    }
+                    
+                    w?.color = parent.color
+                    parent.color = Color.BLACK
+                    w?.left?.color = Color.BLACK
+                    rotateRight(parent)
+                    node = root ?: break
+                }
             }
         }
         node.color = Color.BLACK
     }
-
+    
     /*
-        Recursive height search
-
-        @return Height of the tree
+     *  Recursive height search
+     *
+     *  @return Height of the tree
     */
     private fun height(node: RBNode<K, V>?): Int {
 
@@ -372,14 +368,13 @@ class RBTree<K : Comparable<K>,V> private constructor(
     }
 
     /*
-        Cleaning of a tree
-    */
+     *  Cleaning of a tree
+     */
     override fun clean() {
         root = null
     }
     
-    
-    /**
+    /*
      * Returns an iterator to traverse the RBTree.
      *
      * @return Iterator of key-value pairs
