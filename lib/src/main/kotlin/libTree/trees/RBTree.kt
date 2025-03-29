@@ -244,7 +244,6 @@ class RBTree<K : Comparable<K>,V> private constructor(
         }
     }
 
-
     /*
      * Search element by key (for containsKey)
      *
@@ -268,50 +267,46 @@ class RBTree<K : Comparable<K>,V> private constructor(
      *
      * @param current - Node of the RBTree
      */
-    private fun fixInsertion(current: RBNode<K, V>) {
-        var node = current
-        while (node.parent != null && node.parent!!.color == Color.RED) { // Property 3 is violated
-            //  using !! is okay, because we have already checked != null
-            val parent = node.parent
-            val grandparent = parent?.parent ?: break
-            if (parent == grandparent.left) { // If the node's parent is on the left
-                // From the grandfather of the node
+    private fun fixInsertion(z: RBNode<K, V>) {
+        var zVar = z
+        while (zVar.parent != null && zVar.parent!!.color == Color.RED) {
+            val parent = zVar.parent!!
+            val grandparent = parent.parent ?: break
+            if (parent == grandparent.left) {
                 val uncle = grandparent.right
-                if (uncle != null && uncle.color == Color.RED) { // Uncle red => change uncle and parent of node
-                    // Colors to black, and grandfather to red
+                if (uncle != null && uncle.color == Color.RED) {
                     parent.color = Color.BLACK
                     uncle.color = Color.BLACK
                     grandparent.color = Color.RED
-                    node = grandparent  // Maybe broke invariants => cycle from node's grandfather
-                } else {  // Uncle black
-                    if (node == parent.right) { // Node right descendant => make left
-                        node = parent
-                        rotateLeft(node)
+                    zVar = grandparent
+                } else {
+                    if (zVar == parent.right) {
+                        zVar = parent
+                        rotateLeft(zVar)
                     }
-                    parent.color = Color.BLACK
-                    grandparent.color = Color.RED
-                    rotateRight(grandparent)
+                    zVar.parent!!.color = Color.BLACK
+                    zVar.parent!!.parent!!.color = Color.RED
+                    rotateRight(zVar.parent!!.parent!!)
                 }
-            } else { // If the node's parent is to the right of the node's grandparent,
-                // do everything similarly
+            } else {
                 val uncle = grandparent.left
                 if (uncle != null && uncle.color == Color.RED) {
                     parent.color = Color.BLACK
                     uncle.color = Color.BLACK
                     grandparent.color = Color.RED
-                    node = grandparent
+                    zVar = grandparent
                 } else {
-                    if (node == parent.left) {
-                        node = parent
-                        rotateRight(node)
+                    if (zVar == parent.left) {
+                        zVar = parent
+                        rotateRight(zVar)
                     }
-                    parent.color = Color.BLACK
-                    grandparent.color = Color.RED
-                    rotateLeft(grandparent)
+                    zVar.parent!!.color = Color.BLACK
+                    zVar.parent!!.parent!!.color = Color.RED
+                    rotateLeft(zVar.parent!!.parent!!)
                 }
             }
         }
-        root?.color = Color.BLACK // Make the root black
+        root?.color = Color.BLACK
     }
 
     /*
