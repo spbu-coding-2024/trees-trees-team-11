@@ -22,8 +22,8 @@ class RBTree<K : Comparable<K>,V> private constructor(
     private var root : RBNode<K,V>? = null,
 ) : Tree<K,V, RBTree.RBNode<K, V>> {
 
-   
-     /**
+
+    /**
      * Node class representing each node in the Red Black Tree.
      *
      * @param K the type of keys
@@ -44,14 +44,30 @@ class RBTree<K : Comparable<K>,V> private constructor(
         override var left: RBNode<K, V>? = null,
         override var right: RBNode<K, V>? = null,
         override var height: Long = 1,
-        var color: Color = Color.RED,
+        internal var color: Color = Color.RED,
         internal var parent: RBNode<K, V>? = null
     ) : BaseNode<K, V, RBNode<K, V>>(key, value, left, right, height)
 
-     /**
+    /**
      * Secondary constructor initializing an empty Red Black Tree Tree.
      */
     constructor() : this(null)
+
+    /**
+     * Returns the root node of the RB tree.
+     *
+     * @return The root node
+     */
+    fun getRoot() : RBNode<K, V>? = root
+
+    /**
+     * Sets the root node of the RB tree.
+     *
+     * @param node The new root node
+     */
+    fun setRoot(node: RBNode<K,V>?) {
+        root = node
+    }
 
     /**
      * Calculates the height of the Red Black Tree.
@@ -60,7 +76,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
      */
     override fun height(): Int {
         return height(root)
-    } 
+    }
 
     /*
      * Checks whether the RBTree contains a node with the given key.
@@ -71,8 +87,8 @@ class RBTree<K : Comparable<K>,V> private constructor(
     override fun containsKey(key: K): Boolean {
         return findNode(key) != null
     }
-    
-     /**
+
+    /**
      * Inserts a node into the RBTree with the given key and value.
      *
      * @param key Key for the node
@@ -86,9 +102,9 @@ class RBTree<K : Comparable<K>,V> private constructor(
         while (x != null) { // Looking for a place to insert a new node
             y = x
             if (newNode.key < x.key) {
-                x = x.left 
+                x = x.left
             } else {
-                x = x.right 
+                x = x.right
             }
         }
 
@@ -113,15 +129,15 @@ class RBTree<K : Comparable<K>,V> private constructor(
         var x : RBNode<K,V>? = null
 
         if (z.left == null) {
-            x = z.right 
+            x = z.right
             transplant(z, z.right )
         } else if (z.right == null) {
-            x = z.left 
+            x = z.left
             transplant(z, z.left )
         } else {
             y = minimum(z.right as RBNode<K,V>)
             yOriginalColor = y.color
-            x = y.right 
+            x = y.right
             if (y.parent == z) {
                 if (x != null) {
                     x.parent = y
@@ -144,7 +160,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
 
     /*
      * Search element by key (for containsKey)
-     * 
+     *
      * @param key Key to search for
      * @return Node if the tree contains the key, null otherwise
      */
@@ -152,17 +168,17 @@ class RBTree<K : Comparable<K>,V> private constructor(
         var current = root
         while (current != null) {
             current = when {
-                key < current.key -> current.left 
-                key > current.key -> current.right 
+                key < current.key -> current.left
+                key > current.key -> current.right
                 else -> return current
             }
         }
         return null
     }
 
-    /* 
+    /*
      * Tree balancing after inserting an element
-     * 
+     *
      * @param current - Node of the RBTree
      */
     private fun fixInsertion(current: RBNode<K, V>) {
@@ -190,7 +206,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
                     rotateRight(grandparent)
                 }
             } else { // If the node's parent is to the right of the node's grandparent,
-            // do everything similarly
+                // do everything similarly
                 val uncle = grandparent.left
                 if (uncle != null && uncle.color == Color.RED) {
                     parent.color = Color.BLACK
@@ -210,10 +226,10 @@ class RBTree<K : Comparable<K>,V> private constructor(
         }
         root?.color = Color.BLACK // Make the root black
     }
-    
-    /* 
+
+    /*
      *   Replacing a subtree whose root is u with a subtree v (For erase)
-     * 
+     *
      *   @param u - Node of the RBTree
      *   @param v - Node of the RBTree
     */
@@ -283,9 +299,9 @@ class RBTree<K : Comparable<K>,V> private constructor(
         x.parent = y
     }
 
-    /* 
+    /*
      * Tree balancing after deletion an element
-     * 
+     *
      * @param current - Node of the RBTree
      */
     private fun fixDeletion(x: RBNode<K, V>) {
@@ -302,12 +318,12 @@ class RBTree<K : Comparable<K>,V> private constructor(
                     w = parent.right
                 }
                 if (w == null || ((w.left?.color ?: Color.BLACK) == Color.BLACK &&
-                                  (w.right?.color ?: Color.BLACK) == Color.BLACK)) {
-                     // Case 2 brother is black, both his descendants are black               
+                            (w.right?.color ?: Color.BLACK) == Color.BLACK)) {
+                    // Case 2 brother is black, both his descendants are black
                     w?.color = Color.RED
                     node = parent
                 } else {
-                     // Case 3 brother black, left descendant red, right black
+                    // Case 3 brother black, left descendant red, right black
                     if ((w.right?.color ?: Color.BLACK) == Color.BLACK) {
                         w.left?.color = Color.BLACK
                         w.color = Color.RED
@@ -331,7 +347,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
                     w = parent.left
                 }
                 if (w == null || ((w.left?.color ?: Color.BLACK) == Color.BLACK &&
-                                  (w.right?.color ?: Color.BLACK) == Color.BLACK)) {
+                            (w.right?.color ?: Color.BLACK) == Color.BLACK)) {
                     w?.color = Color.RED
                     node = parent
                 } else {
@@ -341,7 +357,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
                         rotateLeft(w)
                         w = parent.left
                     }
-                    
+
                     w?.color = parent.color
                     parent.color = Color.BLACK
                     w?.left?.color = Color.BLACK
@@ -352,7 +368,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
         }
         node.color = Color.BLACK
     }
-    
+
     /*
      *  Recursive height search
      *
@@ -373,7 +389,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
     override fun clean() {
         root = null
     }
-    
+
     /*
      * Returns an iterator to traverse the RBTree.
      *
@@ -391,5 +407,3 @@ class RBTree<K : Comparable<K>,V> private constructor(
         return list.iterator()
     }
 }
-
-
