@@ -126,16 +126,16 @@ class RBTree<K : Comparable<K>,V> private constructor(
         val z = findNode(key) ?: return
         var y = z
         var yOriginalColor = y.color
-        var x : RBNode<K,V>? = null
+        var x: RBNode<K, V>? = null
 
         if (z.left == null) {
             x = z.right
-            transplant(z, z.right )
+            transplant(z, z.right)
         } else if (z.right == null) {
             x = z.left
-            transplant(z, z.left )
+            transplant(z, z.left)
         } else {
-            y = minimum(z.right as RBNode<K,V>)
+            y = minimum(z.right as RBNode<K, V>)
             yOriginalColor = y.color
             x = y.right
             if (y.parent == z) {
@@ -143,20 +143,107 @@ class RBTree<K : Comparable<K>,V> private constructor(
                     x.parent = y
                 }
             } else {
-                transplant(y, y.right )
+                transplant(y, y.right)
                 y.right = z.right
-                (y.right )?.parent = y
+                (y.right)?.parent = y
             }
             transplant(z, y)
             y.left = z.left
-            (y.left )?.parent = y
+            (y.left)?.parent = y
+            y.color = z.color
         }
-        if (yOriginalColor == Color.BLACK && x != null) {
-            fixDeletion(x)
+        if (yOriginalColor == Color.BLACK) {
+            if (x != null) {
+                fixDeletion(x)
+            } else {
+                val parent = when {
+                    z.parent != null -> z.parent
+                    y.parent != null -> y
+                    else -> null
+                }
+                if (parent != null) {
+
+                    val isMissingLeft = if (z.parent != null) (z.parent?.left == null) else false
+                    fixDeletionWhenNull(parent, isMissingLeft)
+                }
+            }
         }
     }
 
     // --- Private helper methods for RBTree operations ---
+
+    private fun fixDeletionWhenNull(parent: RBNode<K, V>, missingIsLeft: Boolean) {
+        var currentParent = parent
+        var isMissingLeft = missingIsLeft
+
+        while (currentParent != root) {
+            if (isMissingLeft) {
+                var w = currentParent.right
+                if (w != null && w.color == Color.RED) {
+                    // Случай 1: брат красный
+                    w.color = Color.BLACK
+                    currentParent.color = Color.RED
+                    rotateLeft(currentParent)
+                    w = currentParent.right
+                }
+                val wLeftColor = w?.left?.color ?: Color.BLACK
+                val wRightColor = w?.right?.color ?: Color.BLACK
+                if (w == null || (wLeftColor == Color.BLACK && wRightColor == Color.BLACK)) {
+                    // Случай 2: брат чёрный и оба его потомка чёрные
+                    w?.color = Color.RED
+                    val gp = currentParent.parent
+                    if (gp == null) break
+                    isMissingLeft = (gp.left == currentParent)
+                    currentParent = gp
+                } else {
+                    if ((w?.right?.color ?: Color.BLACK) == Color.BLACK) {
+                        // Случай 3: брат чёрный, левый потомок брата красный, правый чёрный
+                        w?.left?.color = Color.BLACK
+                        w?.color = Color.RED
+                        if (w != null) rotateRight(w)
+                        w = currentParent.right
+                    }
+                    // Случай 4: брат чёрный, правый потомок брата красный
+                    w?.color = currentParent.color
+                    currentParent.color = Color.BLACK
+                    w?.right?.color = Color.BLACK
+                    rotateLeft(currentParent)
+                    break
+                }
+            } else {
+                // Симметричный случай для отсутствующего правого потомка
+                var w = currentParent.left
+                if (w != null && w.color == Color.RED) {
+                    w.color = Color.BLACK
+                    currentParent.color = Color.RED
+                    rotateRight(currentParent)
+                    w = currentParent.left
+                }
+                val wLeftColor = w?.left?.color ?: Color.BLACK
+                val wRightColor = w?.right?.color ?: Color.BLACK
+                if (w == null || (wLeftColor == Color.BLACK && wRightColor == Color.BLACK)) {
+                    w?.color = Color.RED
+                    val gp = currentParent.parent
+                    if (gp == null) break
+                    isMissingLeft = (gp.left == currentParent)
+                    currentParent = gp
+                } else {
+                    if ((w?.left?.color ?: Color.BLACK) == Color.BLACK) {
+                        w?.right?.color = Color.BLACK
+                        w?.color = Color.RED
+                        if (w != null) rotateLeft(w)
+                        w = currentParent.left
+                    }
+                    w?.color = currentParent.color
+                    currentParent.color = Color.BLACK
+                    w?.left?.color = Color.BLACK
+                    rotateRight(currentParent)
+                    break
+                }
+            }
+        }
+    }
+
 
     /*
      * Search element by key (for containsKey)
