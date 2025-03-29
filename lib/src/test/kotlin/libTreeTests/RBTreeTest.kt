@@ -98,7 +98,7 @@ open class RBTreeTest {
         }
         tree.erase(deleteKey)
         assertTrue(checker.checkTree(), "RBTree invariant violated after deleting $deleteKey")
-        val result = tree.iterator().asSequence().map() { it.first}.toList()
+        val result = tree.iterator().asSequence().map { it.first}.toList()
         assertEquals(expected, result, "Preorder traversal after deletion does not match expected order")
     }
 
@@ -130,7 +130,7 @@ open class RBTreeTest {
     }
 
     @Test
-    fun testRandonInsertionsDeletions() {
+    fun testRandomInsertionsDeletions() {
         val random = Random(42)
         val inserted = mutableSetOf<Int>()
         for (i in 1..1000) {
