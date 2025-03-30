@@ -34,14 +34,16 @@ class BSTree<K : Comparable<K>, V> private constructor(
     constructor() : this(null)
 
     /**
-     * Returns the root node of the RB tree.
+     * Returns the root node of the BS tree.
      *
      * @return The root node.
      */
-    fun getRoot() : BSNode<K, V>? = root
+    fun getRoot() : BSNode<K, V>? {
+        return root
+    }
 
     /**
-     * Sets the root node of the RB tree.
+     * Sets the root node of the BS tree.
      *
      * @param node The new root node.
      */
@@ -50,7 +52,7 @@ class BSTree<K : Comparable<K>, V> private constructor(
     }
 
     /**
-     * Calculates the height of the Red Black Tree.
+     * Calculates the height of the BS Tree.
      *
      * @return Height of the tree.
      */
@@ -64,7 +66,9 @@ class BSTree<K : Comparable<K>, V> private constructor(
      * @param key The key to search for.
      * @return True if the key contains in the tree, otherwise false.
      */
-    override fun containsKey(key: K): Boolean = findNode(key) != null
+    override fun containsKey(key: K): Boolean {
+        return findNode(key) != null
+    }
 
     /**
      * Removes a node with the key from the tree.
