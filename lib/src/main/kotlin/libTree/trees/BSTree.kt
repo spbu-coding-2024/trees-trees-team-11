@@ -3,12 +3,23 @@ package libTree.trees
 import libTree.interfaceTree.Tree
 
 /**
- * Implementation of a Binary Search Tree (BST)
+ * Implementation of a Binary Search Tree (BST).
+ *
+ * @param K The type of the node's key, which must be Comparable.
+ * @param V The type of mapped values.
  */
 class BSTree<K : Comparable<K>, V> private constructor(
     private var root: BSNode<K, V>? = null,
 ) : Tree<K, V, BSTree.BSNode<K, V>> {
-
+    /**
+     * Represents a node in the BS Tree.
+     *
+     * @param K The type of key.
+     * @param V The type of value.
+     * @property left The left child of the node.
+     * @property right The right child of the node.
+     * @property height Height of the node in the tree.
+     */
     class BSNode<K : Comparable<K>, V>(
         key: K,
         value: V,
@@ -17,13 +28,96 @@ class BSTree<K : Comparable<K>, V> private constructor(
         override var height: Long = 1,
     ) : BaseNode<K, V, BSNode<K, V>>(key, value, left, right, height)
 
+    /**
+     * Secondary constructor initializing an empty BS Tree.
+     */
     constructor() : this(null)
 
     /**
-     * Returns the height of the tree using recursive approach
+     * Returns the root node of the RB tree.
+     *
+     * @return The root node.
      */
-    override fun height(): Int = heightOfTree(root)
+    fun getRoot() : BSNode<K, V>? = root
 
+    /**
+     * Sets the root node of the RB tree.
+     *
+     * @param node The new root node.
+     */
+    fun setRoot(node: BSNode<K, V>?) {
+        root = node
+    }
+
+    /**
+     * Calculates the height of the Red Black Tree.
+     *
+     * @return Height of the tree.
+     */
+    override fun height(): Int {
+        return heightOfTree(root)
+    }
+
+    /**
+     * Checks if the tree contains a node with the given key.
+     *
+     * @param key The key to search for.
+     * @return True if the key contains in the tree, otherwise false.
+     */
+    override fun containsKey(key: K): Boolean = findNode(key) != null
+
+    /**
+     * Removes a node with the key from the tree.
+     *
+     * @param key The key of the node to be removed.
+     */
+    override fun erase(key: K) {
+        root = deleteNode(root, key)
+    }
+
+    /**
+     * Inserts a node into the tree using given key and value.
+     *
+     * @param key Key for the node.
+     * @param value Value for the node.
+     */
+    override fun insert(key: K, value: V) {
+        root = insertNode(root, key, value)
+    }
+
+    /**
+     * Clears the tree by removing all nodes.
+     */
+    override fun clean() {
+        root = null
+    }
+
+    /**
+     * Returns an iterator for traversing the tree in Inorder (left -> root -> right).
+     *
+     * @return Iterator of key-value pairs.
+     */
+    override fun iterator(): Iterator<Pair<K, V>> {
+        val list = mutableListOf<Pair<K, V>>()
+        fun treeIterator(node: BSNode<K, V>?) {
+            if (node == null) {
+                return
+            }
+
+            treeIterator(node.left)
+            list.add(node.key to node.value)
+            treeIterator(node.right)
+        }
+
+        treeIterator(root)
+        return list.iterator()
+    }
+
+    // ================ Private helper methods for BS Tree operations ================
+
+    /**
+     * The helper function which returns the height of the tree using recursive approach.
+     */
     private fun heightOfTree(root: BSNode<K, V>?): Int {
         if (root == null) {
             return 0
@@ -33,21 +127,7 @@ class BSTree<K : Comparable<K>, V> private constructor(
     }
 
     /**
-     * Clears the tree by removing all nodes
-     */
-    override fun clean() {
-        root = null
-    }
-
-    /**
-     * Checks if the tree contains a key
-     */
-    override fun containsKey(key: K): Boolean = findNode(key) != null
-
-    /**
-     * Finds and returns the node with the specified key using iterative search
-     *
-     * @return the node containing the key, or null if not found
+     * The helper function which finds and returns the node with the key using iterative search.
      */
     private fun findNode(key: K): BSNode<K, V>? {
         var current: BSNode<K, V>? = root
@@ -65,46 +145,9 @@ class BSTree<K : Comparable<K>, V> private constructor(
 
         return null
     }
-    
-    /**
-     * Inserts a key-value pair into the tree
-     */
-    override fun insert(key: K, value: V) {
-        root = insertNode(root, key, value)
-    }
 
     /**
-     * Recursive helper function for inserting a key-value pair into the tree
-     *
-     * @return The updated node after insertion
-     */
-    private fun insertNode(node: BSNode<K, V>?, key: K, value: V): BSNode<K, V> {
-        if (node == null) {
-            return BSNode(key, value)
-        }
-
-        if (key < node.key) {
-            node.left = insertNode(node.left, key, value)
-        } else if (key > node.key) {
-            node.right = insertNode(node.right, key, value)
-        } else {
-            node.value = value
-        }
-
-        return node
-    }
-
-    /**
-     * Removes a key from the tree
-     */
-    override fun erase(key: K) {
-        root = deleteNode(root, key)
-    }
-
-    /**
-     * Recursive helper function for deleting a node with the specified key
-     *
-     * @return The updated node after deletion
+     * Recursive helper function for deleting a node with the key.
      */
     private fun deleteNode(node: BSNode<K, V>?, key: K): BSNode<K, V>? {
         if (node == null) {
@@ -135,7 +178,7 @@ class BSTree<K : Comparable<K>, V> private constructor(
     }
 
     /**
-     * Returns the node with the minimum key in the given subtree
+     * Returns the node with the minimum key in the given subtree.
      */
     private fun minValueNode(node: BSNode<K, V>?): BSNode<K, V>? {
         var current: BSNode<K, V>? = node
@@ -147,21 +190,21 @@ class BSTree<K : Comparable<K>, V> private constructor(
     }
 
     /**
-     * Returns an iterator for traversing the tree in Inorder (left -> root -> right)
+     * Recursive helper function for inserting a node into the tree.
      */
-    override fun iterator(): Iterator<Pair<K, V>> {
-        val list = mutableListOf<Pair<K, V>>()
-        fun treeIterator(node: BSNode<K, V>?) {
-            if (node == null) {
-                return
-            }
-
-            treeIterator(node.left)
-            list.add(node.key to node.value)
-            treeIterator(node.right)
+    private fun insertNode(node: BSNode<K, V>?, key: K, value: V): BSNode<K, V> {
+        if (node == null) {
+            return BSNode(key, value)
         }
 
-        treeIterator(root)
-        return list.iterator()
+        if (key < node.key) {
+            node.left = insertNode(node.left, key, value)
+        } else if (key > node.key) {
+            node.right = insertNode(node.right, key, value)
+        } else {
+            node.value = value
+        }
+
+        return node
     }
 }
