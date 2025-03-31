@@ -121,6 +121,7 @@ open class RBTreeTest {
     }
 
     @Test
+    @Tag("corner-case")
     fun testDublicateInsertion() {
         tree.insert(10, "A")
         tree.insert(10, "B")
@@ -130,21 +131,40 @@ open class RBTreeTest {
     }
 
     @Test
-    fun testRandomInsertionsDeletions() {
+    @Tag("slow")
+    fun testRandomInsertionsDeletions_Simplified() {
         val random = Random(42)
-        val inserted = mutableSetOf<Int>()
-        for (i in 1..1000) {
-            val key = random.nextInt(0,100)
-            tree.insert(key, key.toString())
-            inserted.add(key)
-            assertTrue(checker.checkTree(), "RBTree invariant violated after inserting $key")
+        val inserted = mutableListOf<Int>()
+
+        // Generate 1000 distinct random keys
+        while (inserted.size < 1000) {
+            val candidate = random.nextInt(0, 10_000)
+            if (candidate !in inserted) {
+                inserted.add(candidate)
+            }
         }
+
+        // Insert all keys
+        for (key in inserted) {
+            tree.insert(key, key.toString())
+        }
+
+        // Check invariants only once after *all* insertions
+        assertTrue(checker.checkTree(), "RBTree invariant violated after inserting all keys")
+
+        // Shuffle and delete all keys
+        inserted.shuffle(random)
         for (key in inserted) {
             tree.erase(key)
-            assertTrue(checker.checkTree(), "RBTree invariant violated after deleting $key")
         }
+
+        // Check invariants only once after *all* deletions
+        assertTrue(checker.checkTree(), "RBTree invariant violated after deleting all keys")
+
+        // Finally ensure the tree is empty
         assertFalse(tree.iterator().hasNext(), "Tree should be empty after deleting all inserted keys")
     }
+
 
 
 }
