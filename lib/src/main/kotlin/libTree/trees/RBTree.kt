@@ -250,7 +250,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
                     // Case 2 or 3: Uncle is black
                     if (z == parentOf(z)?.right) {
                         // Case 2: z is right child => left rotate parent
-                        z = parentOf(z) ?: return
+                        z = parentOf(z) ?: break
                         rotateLeft(z)
                     }
                     // Case 3
@@ -269,7 +269,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
                     z = gp
                 } else {
                     if (z == parentOf(z)?.left) {
-                        z = parentOf(z) ?: return
+                        z = parentOf(z) ?: break
                         rotateRight(z)
                     }
                     setColor(parentOf(z), Color.BLACK)
