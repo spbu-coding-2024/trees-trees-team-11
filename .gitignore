@@ -1,4 +1,6 @@
 .gradle
 .idea
-build
 lib/build
+examples/exampleAVL/build
+examples/exampleBST/build
+examples/exampleRB/build
