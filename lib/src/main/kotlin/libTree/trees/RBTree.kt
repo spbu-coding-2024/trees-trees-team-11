@@ -262,7 +262,6 @@ class RBTree<K : Comparable<K>,V> private constructor(
                 // Mirror
                 val uncle = gp.left
                 if (colorOf(uncle) == Color.RED) {
-                    // Case 1: Uncle is red
                     setColor(parentOf(z), Color.BLACK)
                     setColor(uncle, Color.BLACK)
                     setColor(gp, Color.RED)

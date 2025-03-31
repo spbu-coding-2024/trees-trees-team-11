@@ -14,9 +14,6 @@ class UtilsFunctionsRBTree<K : Comparable<K>, V>(private val tree: RBTree<K, V>)
         val blackHeight = checkRBProperties(root)
         if (blackHeight == -1) return false
 
-        // 3) (Optional) Check that it’s a valid BST. Comment out if you allow duplicates or non‐BST usage
-        // if (!checkBSTProperty(root, null, null)) return false
-
         return true
     }
 
@@ -46,12 +43,13 @@ class UtilsFunctionsRBTree<K : Comparable<K>, V>(private val tree: RBTree<K, V>)
         val rightBlackHeight = checkRBProperties(node.right)
         if (rightBlackHeight == -1) return -1
 
-        // If left and right black‐heights differ, that’s a violation
+        // If left and right black‐heights differ
         if (leftBlackHeight != rightBlackHeight) return -1
 
         // If this node is black, add 1 to the black‐height
         return leftBlackHeight + if (node.color == RBTree.Color.BLACK) 1 else 0
     }
+    // function for getting height
     fun getHeight(): Int {
         return getHeightRecursive(tree.getRoot())
     }

@@ -51,7 +51,7 @@ open class RBTreeTest {
             ),
             Arguments.of(
                 listOf(179 to "X", 239 to "Y", 52 to "Z", 812 to "W"),
-                listOf(179, 52, 239, 812)
+                listOf(179, 52, 239, 812) // 52
             )
         )
 
@@ -189,7 +189,7 @@ open class RBTreeTest {
         // сheck invariants only once after all deletions
         assertTrue(checker.checkTree(), "RBTree invariant violated after deleting all keys")
 
-        // аinally ensure the tree is empty
+        // ensure the tree is empty
         assertFalse(tree.iterator().hasNext(), "Tree should be empty after deleting all inserted keys")
     }
 }
