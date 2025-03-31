@@ -236,50 +236,52 @@ class RBTree<K : Comparable<K>,V> private constructor(
     private fun fixInsertion(node: RBNode<K, V>) {
         var z = node
         while (colorOf(parentOf(z)) == Color.RED) {
-            val gp = parentOf(parentOf(z)) ?: break// grandparent
+            val p = parentOf(z) ?: break
+            val gp = parentOf(p) ?: break
 
-
-            if (parentOf(z) == gp.left) {
+            if (p == gp.left) {
                 val uncle = gp.right
+                // Case 1: Uncle is red
                 if (colorOf(uncle) == Color.RED) {
-                    // Case 1: Uncle is red
-                    setColor(parentOf(z), Color.BLACK)
+                    setColor(p, Color.BLACK)
                     setColor(uncle, Color.BLACK)
                     setColor(gp, Color.RED)
                     z = gp
                 } else {
-                    // Case 2 or 3: Uncle is black
-                    if (z == parentOf(z)?.right) {
-                        // Case 2: z is right child => left rotate parent
-                        z = parentOf(z)!!
+                    // Cases 2: Uncle is black
+                    if (z == p.right) {
+                        // Case 2: z is the right child => left rotate around p
+                        z = p
                         rotateLeft(z)
                     }
-                    // Case 3
-                    setColor(parentOf(z), Color.BLACK)
+                    // Case 3: (z == p.left) after possible rotation => recolor and rotate around gp
+                    setColor(p, Color.BLACK)
                     setColor(gp, Color.RED)
                     rotateRight(gp)
                 }
             } else {
                 // Mirror
                 val uncle = gp.left
+
                 if (colorOf(uncle) == Color.RED) {
-                    // Case 1: Uncle is red
-                    setColor(parentOf(z), Color.BLACK)
+                    setColor(p, Color.BLACK)
                     setColor(uncle, Color.BLACK)
                     setColor(gp, Color.RED)
                     z = gp
                 } else {
-                    if (z == parentOf(z)?.left) {
-                        z = parentOf(z)!!
+                    if (z == p.left) {
+                        z = p
                         rotateRight(z)
                     }
-                    setColor(parentOf(z), Color.BLACK)
+                    // Case 3
+                    setColor(p, Color.BLACK)
                     setColor(gp, Color.RED)
                     rotateLeft(gp)
                 }
             }
         }
-        // Root is always black
+
+        // Root must always be black
         root?.color = Color.BLACK
     }
 
