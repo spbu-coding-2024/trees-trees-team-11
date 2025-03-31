@@ -5,7 +5,7 @@ import libTree.trees.RBTree
 class UtilsFunctionsRBTree<K : Comparable<K>, V>(private val tree: RBTree<K, V>) {
 
     fun checkTree(): Boolean {
-        val root = tree.getRoot() ?: return true // Empty tree is trivially correct
+        val root = tree.getRoot() ?: return true // empty tree is correct
 
         // 1) Root must be black if the tree is not empty
         if (root.color != RBTree.Color.BLACK) return false
@@ -22,8 +22,8 @@ class UtilsFunctionsRBTree<K : Comparable<K>, V>(private val tree: RBTree<K, V>)
 
     /**
      * Recursively checks:
-     *   - If a node is red, then its children must be black.
-     *   - The black‐height (number of black nodes on any path from a node down to a null leaf)
+     *     If a node is red, then its children must be black.
+     *     The black‐height (number of black nodes on any path from a node down to a null leaf)
      *     is consistent across the left and right subtrees.
      *
      * @return The black‐height from [node] down to leaves, or -1 if a violation is found.
@@ -52,27 +52,18 @@ class UtilsFunctionsRBTree<K : Comparable<K>, V>(private val tree: RBTree<K, V>)
         // If this node is black, add 1 to the black‐height
         return leftBlackHeight + if (node.color == RBTree.Color.BLACK) 1 else 0
     }
-
-    /**
-     * (Optional) Checks that the tree satisfies the BST property:
-     *   For every node, all keys in the left subtree are < node.key,
-     *   and all keys in the right subtree are > node.key.
-     */
-    private fun checkBSTProperty(
-        node: RBTree.RBNode<K, V>?,
-        min: K?,
-        max: K?
-    ): Boolean {
-        if (node == null) return true
-
-        val key = node.key
-        // If 'min' is set, current key must be strictly greater than min
-        if (min != null && key <= min) return false
-        // If 'max' is set, current key must be strictly less than max
-        if (max != null && key >= max) return false
-
-        return checkBSTProperty(node.left, min, key) &&
-                checkBSTProperty(node.right, key, max)
+    fun getHeight(): Int {
+        return getHeightRecursive(tree.getRoot())
     }
+
+    private fun getHeightRecursive(node: RBTree.RBNode<K, V>?): Int {
+        if (node == null) return 0
+        val leftHeight = getHeightRecursive(node.left)
+        val rightHeight = getHeightRecursive(node.right)
+        return 1 + maxOf(leftHeight, rightHeight)
+    }
+
+a
+
 }
 

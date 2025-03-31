@@ -3,7 +3,7 @@ package libTree.trees
 import libTree.interfaceTree.Tree
 import kotlin.math.max
 
-/*
+/**
  * Implementation of an Red Black Tree, a self-balancing binary search tree.
  *
  * @param K the type of keys maintained by this tree, must be Comparable
@@ -78,7 +78,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
         return height(root)
     }
 
-    /*
+    /**
      * Checks whether the RBTree contains a node with the given key.
      *
      * @param key Key to search for
@@ -123,7 +123,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
         fixInsertion(newNode)
     }
 
-    /*
+    /**
      * Delets a node into the RBTree with the given key.
      *
      * @param key Key for the node
@@ -180,28 +180,37 @@ class RBTree<K : Comparable<K>,V> private constructor(
 
     // --- Private helper methods for RBTree operations ---
 
+    /**
+    * Help function for fixDeletion and fixInsertion
+    *
+    * @param node RBNode whose color we want to find out
+    * @return Color
+    */
     private fun colorOf(n: RBNode<K, V>?): Color {
-        // Null children are treated as BLACK
+        // null children are treated as BLACK
         return n?.color ?: Color.BLACK
     }
 
+    /**
+    * Help function for fixDeletion and fixInsertion
+    *
+    * @param node RBNode
+    * @return RBNode parent
+    */
     private fun parentOf(n: RBNode<K, V>?): RBNode<K, V>? {
         return n?.parent
     }
 
-    private fun leftOf(n: RBNode<K, V>?): RBNode<K, V>? {
-        return n?.left
-    }
-
-    private fun rightOf(n: RBNode<K, V>?): RBNode<K, V>? {
-        return n?.right
-    }
-
+    /**
+    * Help function for fixDeletion and fixInsertion
+    *
+    * @param node RBNode for setting color
+    */
     private fun setColor(n: RBNode<K, V>?, c: Color) {
         if (n != null) n.color = c
     }
 
-    /*
+    /**
      * Search element by key (for containsKey)
      *
      * @param key Key to search for
@@ -219,7 +228,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
         return null
     }
 
-    /*
+    /**
      * Tree balancing after inserting an element
      *
      * @param current - Node of the RBTree
@@ -227,8 +236,8 @@ class RBTree<K : Comparable<K>,V> private constructor(
     private fun fixInsertion(node: RBNode<K, V>) {
         var z = node
         while (colorOf(parentOf(z)) == Color.RED) {
-            val gp = parentOf(parentOf(z)) // grandparent
-                ?: break
+            val gp = parentOf(parentOf(z)) ?: break// grandparent
+
 
             if (parentOf(z) == gp.left) {
                 val uncle = gp.right
@@ -274,84 +283,11 @@ class RBTree<K : Comparable<K>,V> private constructor(
         root?.color = Color.BLACK
     }
 
-
-    /*
-     *   Replacing a subtree whose root is u with a subtree v (For erase)
-     *
-     *   @param u - Node of the RBTree
-     *   @param v - Node of the RBTree
-    */
-    private fun transplant(u: RBNode<K, V>, v: RBNode<K, V>?) {
-        if (u.parent == null) {
-            root = v
-        } else if (u == u.parent?.left) {
-            u.parent?.left = v
-        } else {
-            u.parent?.right = v
-        }
-        if (v != null) {
-            v.parent = u.parent
-        }
-    }
-
     /**
-     * Finds the node with the minimum key starting from a given node.
-     */
-    private fun minimum(node : RBNode<K, V>) : RBNode<K, V> {
-        var current = node
-        while (current.left != null) {
-            current = current.left as RBNode<K,V>
-        }
-        return current
-    }
-
-    /*
-     * Performs a left rotation around a given node.
-     */
-    private fun rotateLeft(x: RBNode<K, V>) {
-        val y = x.right  ?: return
-        x.right = y.left
-        if (y.left != null) {
-            (y.left as RBNode<K, V>).parent = x
-        }
-        y.parent = x.parent
-        if (x.parent == null) { // Nothing to turn
-            root = y
-        } else if (x == x.parent?.left) { // Node glory from parent
-            x.parent?.left = y
-        } else {
-            x.parent?.right = y
-        }
-        y.left = x
-        x.parent = y
-    }
-
-    /*
-     * Performs a right rotation around a given node.
-     */
-    private fun rotateRight(x: RBNode<K, V>) {
-        val y = x.left  ?: return
-        x.left = y.right
-        if (y.right != null) {
-            (y.right as RBNode<K, V>).parent = x
-        }
-        y.parent = x.parent
-        if (x.parent == null) {
-            root = y
-        } else if (x == x.parent?.right) {
-            x.parent?.right = y
-        } else {
-            x.parent?.left = y
-        }
-        y.right = x
-        x.parent = y
-    }
-
-    /*
-     * Tree balancing after deletion an element
-     *
-     * @param current - Node of the RBTree
-     */
+    * Tree balancing after deletion an element
+    *
+    * @param current - Node of the RBTree
+    */
     private fun fixDeletion(x: RBNode<K, V>?) {
         var node = x
         while (node != root && colorOf(node) == Color.BLACK) {
@@ -416,7 +352,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
         setColor(node, Color.BLACK)
     }
 
-    /*
+    /**
      *  Recursive height search
      *
      *  @return Height of the tree
@@ -430,14 +366,86 @@ class RBTree<K : Comparable<K>,V> private constructor(
         }
     }
 
-    /*
+    /**
+     *   Replacing a subtree whose root is u with a subtree v (For erase)
+     *
+     *   @param u - Node of the RBTree
+     *   @param v - Node of the RBTree
+    */
+    private fun transplant(u: RBNode<K, V>, v: RBNode<K, V>?) {
+        if (u.parent == null) {
+            root = v
+        } else if (u == u.parent?.left) {
+            u.parent?.left = v
+        } else {
+            u.parent?.right = v
+        }
+        if (v != null) {
+            v.parent = u.parent
+        }
+    }
+
+    /**
+     * Finds the node with the minimum key starting from a given node.
+     */
+    private fun minimum(node : RBNode<K, V>) : RBNode<K, V> {
+        var current = node
+        while (current.left != null) {
+            current = current.left as RBNode<K,V>
+        }
+        return current
+    }
+
+    /**
+     * Performs a left rotation around a given node.
+     */
+    private fun rotateLeft(x: RBNode<K, V>) {
+        val y = x.right  ?: return
+        x.right = y.left
+        if (y.left != null) {
+            (y.left as RBNode<K, V>).parent = x
+        }
+        y.parent = x.parent
+        if (x.parent == null) { // Nothing to turn
+            root = y
+        } else if (x == x.parent?.left) { // Node glory from parent
+            x.parent?.left = y
+        } else {
+            x.parent?.right = y
+        }
+        y.left = x
+        x.parent = y
+    }
+
+    /**
+     * Performs a right rotation around a given node.
+     */
+    private fun rotateRight(x: RBNode<K, V>) {
+        val y = x.left  ?: return
+        x.left = y.right
+        if (y.right != null) {
+            (y.right as RBNode<K, V>).parent = x
+        }
+        y.parent = x.parent
+        if (x.parent == null) {
+            root = y
+        } else if (x == x.parent?.right) {
+            x.parent?.right = y
+        } else {
+            x.parent?.left = y
+        }
+        y.right = x
+        x.parent = y
+    }
+
+    /**
      *  Cleaning of a tree
      */
     override fun clean() {
         root = null
     }
 
-    /*
+    /**
      * Returns an iterator to traverse the RBTree.
      *
      * @return Iterator of key-value pairs
