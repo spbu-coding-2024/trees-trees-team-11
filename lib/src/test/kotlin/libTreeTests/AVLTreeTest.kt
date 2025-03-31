@@ -26,50 +26,74 @@ open class AVLTreeTest {
     companion object {
         @JvmStatic
         fun insertTestCases(): Stream<Arguments> = Stream.of(
+            // Test 1: Balanced insertion (no rotations required)
             Arguments.of(
                 listOf(10 to "A", 5 to "B", 15 to "C"),
                 listOf(10, 5, 15)
             ),
+
+            // Test 2: LL imbalance (requires single Right rotation)
             Arguments.of(
                 listOf(30 to "A", 20 to "B", 10 to "C"),
                 listOf(20, 10, 30)
             ),
+
+            // Test 3: RL imbalance (requires Right-Left double rotation)
             Arguments.of(
                 listOf(10 to "A", 30 to "B", 20 to "C"),
                 listOf(20, 10, 30)
             ),
+
+            // Test 4: Complex structure with balanced insertions (no rotations)
             Arguments.of(
                 listOf(50 to "A", 30 to "B", 70 to "C", 20 to "D", 40 to "E", 60 to "F", 80 to "G"),
                 listOf(50, 30, 20, 40, 70, 60, 80)
             ),
+
+            // Test 5: LR imbalance (requires Left-Right double rotation)
             Arguments.of(
                 listOf(30 to "A", 10 to "B", 20 to "C"),
                 listOf(20, 10, 30)
             ),
+
+            // Test 6: RR imbalance (requires single Left rotation)
             Arguments.of(
                 listOf(10 to "A", 20 to "B", 30 to "C"),
                 listOf(20, 10, 30)
-            ),
+            )
 
         )
         @JvmStatic
         fun eraseTestCases(): Stream<Arguments> = Stream.of(
+            // Test 1: Root deletion in RR-imbalanced tree (requires left rotation after deletion)
+            // Tests removal of root node with right-right imbalance
             Arguments.of(
                 listOf(10 to "A", 20 to "B", 30 to "C"),
                 listOf(20),
                 listOf(30, 10)
             ),
+
+            // Test 2: Sequential deletions with multiple rotations
+            // Removes left child (30), then its replacement (40), then root (50)
+            // Tests LR case with multiple rebalancing operations
             Arguments.of(
                 listOf(50 to "A", 30 to "B", 70 to "C", 10 to "D", 40 to "E"),
                 listOf(30, 40, 50),
                 listOf(70,10)
             ),
+
+            // Test 3: Complex deletion with two children and subtree reorganization
+            // Removes node (80) with both left and right subtrees
+            // Tests case with successor node (90) replacement and multiple rebalancing
             Arguments.of(
                 listOf(50 to "A",40 to "K", 80 to "B", 20 to "C", 30 to "D", 60 to "E", 100 to "F", 55 to "G", 70 to "H", 90 to "J", 110 to "I"),
                 listOf(80),
                 listOf(50, 30, 20, 40, 90, 60, 55, 70, 100, 110)
-
             ),
+
+            // Test 4: Single child node deletion with height update
+            // Removes node (80) with only right child (90)
+            // Tests simple promotion of right child and AVL height correction
             Arguments.of(
                 listOf(50 to "A",40 to "K", 80 to "B", 90 to "C"),
                 listOf(80),
@@ -221,19 +245,6 @@ open class AVLTreeTest {
     fun `Test for checking height of Tree for empty tree`() {
         assertEquals(0, tree.height())
     }
-
-
-    @Test
-    @Tag("corner-case")
-    fun `Test tree structure after LL-rotation`() {
-        tree.insert(30, "A")
-        tree.insert(20, "B")
-        tree.insert(10, "C")
-        assertEquals(20, tree.getRoot()?.key)
-        assertEquals(10, tree.getRoot()?.left?.key)
-        assertEquals(30, tree.getRoot()?.right?.key)
-    }
-//adf
 
     @Test
     @Tag("slow")
