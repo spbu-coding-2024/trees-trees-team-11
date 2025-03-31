@@ -63,7 +63,6 @@ class UtilsFunctionsRBTree<K : Comparable<K>, V>(private val tree: RBTree<K, V>)
         return 1 + maxOf(leftHeight, rightHeight)
     }
 
-a
 
 }
 
