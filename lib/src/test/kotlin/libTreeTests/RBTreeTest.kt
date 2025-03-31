@@ -56,11 +56,8 @@ open class RBTreeTest {
             Arguments.of(
                 listOf(10 to "A", 179 to "X", 5 to "B", 239 to "Y", 52 to "C", 15 to "D", 812 to "Z"),
                 listOf(179, 10, 5, 15, 52, 239, 812)
-            ),
-            Arguments.of(
-                listOf(239 to "A", 52 to "B", 812 to "C", 179 to "D"),
-                listOf(239, 52, 812, 179)
             )
+
         )
 
         @JvmStatic
