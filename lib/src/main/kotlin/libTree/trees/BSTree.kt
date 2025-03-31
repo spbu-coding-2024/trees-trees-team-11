@@ -158,13 +158,22 @@ class BSTree<K : Comparable<K>, V> private constructor(
             node.left ?: return node.right
             node.right ?: return node.left
 
-            val successor: BSNode<K, V>? = minValueNode(node)
+            val successor: BSNode<K, V>? = minValueNode(node.right)
+
             if (successor != null) {
                 node.key = successor.key
+            }
+
+            if (successor != null) {
+                node.value = successor.value
+            }
+
+            if (successor != null) {
                 node.right = deleteNode(node.right, successor.key)
             }
         }
 
+        heightOfTree(node)
         return node
     }
 
@@ -191,7 +200,8 @@ class BSTree<K : Comparable<K>, V> private constructor(
             key > node.key -> node.right = insertNode(node.right, key, value)
             else -> node.value = value
         }
+
+        heightOfTree(node)
         return node
     }
-
 }
