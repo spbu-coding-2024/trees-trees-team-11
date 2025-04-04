@@ -131,6 +131,14 @@ class AVLTree<K : Comparable<K>, V> private constructor (
         return node.height
     }
 
+
+    /**
+     * Updated height of current node
+     */
+    private fun updateHeight(node: AVLNode<K, V>?) : Long {
+        return 1 + max(heightNode(node?.left), heightNode(node?.right))
+    }
+
     /**
      * Performs a right rotation around a given node.
      */
@@ -141,8 +149,8 @@ class AVLTree<K : Comparable<K>, V> private constructor (
         newNode?.right = node
         node?.left = tempNode
 
-        node?.height = 1 + max(heightNode(node?.left), heightNode(node?.right))
-        newNode?.height = 1 + max(heightNode(newNode?.left), heightNode(newNode?.right))
+        node?.height = updateHeight(node)
+        newNode?.height = updateHeight(newNode)
 
         return newNode
     }
@@ -157,8 +165,8 @@ class AVLTree<K : Comparable<K>, V> private constructor (
         newNode?.left = node
         node?.right = tempNode
 
-        node?.height = 1 + max(heightNode(node?.left), heightNode(node?.right))
-        newNode?.height = 1 + max(heightNode(newNode?.left), heightNode(newNode?.right))
+        node?.height = updateHeight(node)
+        newNode?.height = updateHeight(newNode)
 
         return newNode
     }
