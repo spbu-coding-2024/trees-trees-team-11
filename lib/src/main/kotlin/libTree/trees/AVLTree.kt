@@ -56,7 +56,7 @@ class AVLTree<K : Comparable<K>, V> private constructor (
      * @return Height of the tree
      */
     override fun height(): Int {
-        return heightOfTree(root)
+        return root?.height?.toInt() ?: 0
     }
 
     /**
@@ -232,6 +232,7 @@ class AVLTree<K : Comparable<K>, V> private constructor (
                     val tempNode = minValueNode(localNode.right)
                     if (tempNode != null) {
                         localNode.key = tempNode.key
+                        localNode.value = tempNode.value
                         localNode.right = eraseNode(localNode.right, tempNode.key)
                     }
 
@@ -266,14 +267,6 @@ class AVLTree<K : Comparable<K>, V> private constructor (
         }
 
         return localNode
-    }
-
-    /**
-     * Returns the height of the tree from the specified node.
-     */
-    private fun heightOfTree(node: AVLNode<K, V>?): Int {
-        if (node == null) return 0
-        return 1 + max(heightOfTree(node.left), heightOfTree(node.right))
     }
 
     /**
