@@ -43,15 +43,6 @@ class BSTree<K : Comparable<K>, V> private constructor(
     }
 
     /**
-     * Sets the root node of the BS tree.
-     *
-     * @param node The new root node.
-     */
-    fun setRoot(node: BSNode<K, V>?) {
-        root = node
-    }
-
-    /**
      * Calculates the height of the BS Tree.
      *
      * @return Height of the tree.
