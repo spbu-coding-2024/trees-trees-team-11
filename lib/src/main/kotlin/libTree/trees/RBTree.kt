@@ -389,38 +389,39 @@ class RBTree<K : Comparable<K>, V> private constructor(
     /**
      * Performs a left rotation around a given node.
      */
-    private fun rotateLeft(nodeToRotate: RBNode<K, V>) {
-        val rightChild = nodeToRotate.right ?: return
-        nodeToRotate.right = rightChild.left
-        rightChild.left?.parent = nodeToRotate
-        rightChild.parent = nodeToRotate.parent
-        if (nodeToRotate.parent == null) { // Nothing to turn
+    private fun rotateLeft(node: RBNode<K, V>) {
+        val rightChild = node.right ?: return
+        node.right = rightChild.left
+        rightChild.left?.parent = node
+        rightChild.parent = node.parent
+        if (node.parent == null) { // Nothing to turn
             root = rightChild
-        } else if (nodeToRotate == nodeToRotate.parent?.left) { // Node glory from parent
-            nodeToRotate.parent?.left = rightChild
+        } else if (node == node.parent?.left) { // Node glorrightChild from parent
+            node.parent?.left = rightChild
         } else {
-            nodeToRotate.parent?.right = rightChild
+            node.parent?.right = rightChild
         }
-        rightChild.left = nodeToRotate
-        nodeToRotate.parent = rightChild
+        rightChild.left = node
+        node.parent = rightChild
     }
+
     /**
      * Performs a right rotation around a given node.
      */
-    private fun rotateRight(nodeToRotate: RBNode<K, V>) {
-        val leftChild = nodeToRotate.left ?: return
-        nodeToRotate.left = leftChild.right
-        leftChild.left?.parent = nodeToRotate
-        leftChild.parent = nodeToRotate.parent
-        if (nodeToRotate.parent == null) {
+    private fun rotateRight(node: RBNode<K, V>) {
+        val leftChild = node.left ?: return
+        node.left = leftChild.right
+        leftChild.left?.parent = node
+        leftChild.parent = node.parent
+        if (node.parent == null) {
             root = leftChild
-        } else if (nodeToRotate == nodeToRotate.parent?.right) {
-            nodeToRotate.parent?.right = leftChild
+        } else if (node == node.parent?.right) {
+            node.parent?.right = leftChild
         } else {
-            nodeToRotate.parent?.left = leftChild
+            node.parent?.left = leftChild
         }
-        leftChild.right = nodeToRotate
-        nodeToRotate.parent = leftChild
+        leftChild.right = node
+        node.parent = leftChild
     }
 
     /**
