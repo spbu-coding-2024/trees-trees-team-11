@@ -141,33 +141,44 @@ open class AVLTreeTest {
     @Tag("insert")
     fun `Test for function insert in AVLTree`(inserts: List<Pair<Int,String>>, resultNodes: List<Int>) {
         inserts.forEach { (key, value) -> tree.insert(key, value) }
-        val treeList = mutableListOf<Int>()
-        for ((key, _) in tree) {
-            treeList.add(key)
+        val treeListKeys = mutableListOf<Int>()
+        val treeListPairs = mutableListOf<Pair<Int,String>>()
+        for ((key, value) in tree) {
+            treeListKeys.add(key)
+            treeListPairs.add(key to value)
         }
-
-
-        assertEquals(resultNodes, treeList)
+        assertEquals(resultNodes, treeListKeys)
         assertTrue(checker.is_balanced(tree.getRoot()))
         assertEquals(inserts.size, checker.nodesInTreeCounter(tree))
+        val insertsMap = inserts.toMap()
+        treeListPairs.forEach { (k,v) ->
+            assertEquals(insertsMap[k], v)
+        }
     }
 
     @ParameterizedTest
     @MethodSource("eraseTestCases")
     @Tag("erase")
     fun `Tests for erasing only contains nodes in AVLTree`(inserts: List<Pair<Int,String>>, erases: List<Int>, resultNodes: List<Int>) {
-        val treeList = mutableListOf<Int>()
+        val treeListKeys = mutableListOf<Int>()
+        val treeListPairs = mutableListOf<Pair<Int,String>>()
         inserts.forEach { (key, value) -> tree.insert(key, value) }
-        erases.forEach{key ->
+        erases.forEach { key ->
             tree.erase(key)
             assertTrue(checker.is_balanced(tree.getRoot()))
         }
-        for ((key, _) in tree) {
-            treeList.add(key)
+        for ((key, value) in tree) {
+            treeListKeys.add(key)
+            treeListPairs.add(key to value)
         }
-        assertEquals(resultNodes, treeList)
+        assertEquals(resultNodes, treeListKeys)
         assertEquals(inserts.size - erases.size, checker.nodesInTreeCounter(tree))
+        val insertsMap = inserts.toMap()
+        treeListPairs.forEach { (k,v) ->
+            assertEquals(insertsMap[k], v)
+        }
     }
+
 
     @ParameterizedTest
     @MethodSource("cleanTestCases")
