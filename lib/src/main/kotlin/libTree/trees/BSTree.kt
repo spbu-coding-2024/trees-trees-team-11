@@ -57,7 +57,7 @@ class BSTree<K : Comparable<K>, V> private constructor(
      * @return Height of the tree.
      */
     override fun height(): Int {
-        return heightOfTree(root)
+        return getHeight(root)
     }
 
     /**
@@ -105,7 +105,6 @@ class BSTree<K : Comparable<K>, V> private constructor(
         val list = mutableListOf<Pair<K, V>>()
         fun treeIterator(node: BSNode<K, V>?) {
             node ?: return
-
             treeIterator(node.left)
             list.add(node.key to node.value)
             treeIterator(node.right)
@@ -120,11 +119,11 @@ class BSTree<K : Comparable<K>, V> private constructor(
     /**
      * The helper function which returns the height of the tree using recursive approach.
      */
-    private fun heightOfTree(root: BSNode<K, V>?): Int {
-        return if (root == null) {
-            0
+    private fun getHeight(node: BSNode<K, V>?): Int {
+        if (node == null) {
+            return 0
         } else {
-            1 + maxOf(heightOfTree(root.left), heightOfTree(root.right))
+            return 1 + maxOf(getHeight(node.left), getHeight(node.right))
         }
     }
 
@@ -149,38 +148,29 @@ class BSTree<K : Comparable<K>, V> private constructor(
      */
     private fun deleteNode(node: BSNode<K, V>?, key: K): BSNode<K, V>? {
         node ?: return null
+        when {
+            node.key > key -> node.left = deleteNode(node.left, key)
+            node.key < key -> node.right = deleteNode(node.right, key)
+            else -> {
+                node.left ?: return node.right
+                node.right ?: return node.left
 
-        if (node.key > key) {
-            node.left = deleteNode(node.left, key)
-        } else if (node.key < key) {
-            node.right = deleteNode(node.right, key)
-        } else {
-            node.left ?: return node.right
-            node.right ?: return node.left
-
-            val successor: BSNode<K, V>? = minValueNode(node.right)
-
-            if (successor != null) {
-                node.key = successor.key
-            }
-
-            if (successor != null) {
-                node.value = successor.value
-            }
-
-            if (successor != null) {
-                node.right = deleteNode(node.right, successor.key)
+                val successor: BSNode<K, V>? = findMinNode(node.right)
+                if (successor != null) {
+                    node.key = successor.key
+                    node.value = successor.value
+                    node.right = deleteNode(node.right, successor.key)
+                }
             }
         }
 
-        heightOfTree(node)
         return node
     }
 
     /**
      * Returns the node with the minimum key in the given subtree.
      */
-    private fun minValueNode(node: BSNode<K, V>?): BSNode<K, V>? {
+    private fun findMinNode(node: BSNode<K, V>?): BSNode<K, V>? {
         var current: BSNode<K, V>? = node
         while (current?.left != null) {
             current = current.left
@@ -194,14 +184,12 @@ class BSTree<K : Comparable<K>, V> private constructor(
      */
     private fun insertNode(node: BSNode<K, V>?, key: K, value: V): BSNode<K, V> {
         node ?: return BSNode(key, value)
-
         when {
             key < node.key -> node.left = insertNode(node.left, key, value)
             key > node.key -> node.right = insertNode(node.right, key, value)
             else -> node.value = value
         }
 
-        heightOfTree(node)
         return node
     }
 }
