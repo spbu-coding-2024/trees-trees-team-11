@@ -2,13 +2,18 @@ package libTreeTests
 
 import libTree.trees.BSTree
 import libTreeTestsUtils.BSTreeUtilsFunctions
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import java.util.stream.Stream
 import java.util.concurrent.TimeUnit
+import java.util.stream.Stream
 import kotlin.random.Random
 
 class BSTreeTest {
@@ -26,22 +31,27 @@ class BSTreeTest {
 
         @JvmStatic
         fun heightTestCases(): Stream<Arguments> = Stream.of(
+            // Test 1: Empty tree
             Arguments.of(
                 emptyList<Pair<Int, String>>(),
                 0
             ),
+            // Test 2: Tree with 1 element
             Arguments.of(
                 listOf(10 to "A"),
                 1
             ),
+            // Test 3: Tree with 2 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B"),
                 2
             ),
+            // Test 4: Tree with 3 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B", 15 to "C"),
                 2
             ),
+            // Test 5: Tree with 4 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B", 15 to "C", 1 to "D"),
                 3
@@ -50,16 +60,19 @@ class BSTreeTest {
 
         @JvmStatic
         fun containKeyTestCases(): Stream<Arguments> = Stream.of(
+            // Test 1: Empty tree
             Arguments.of(
                 emptyList<Pair<Int, String>>(),
                 88,
                 false
             ),
+            // Test 2: Tree with 1 element
             Arguments.of(
                 listOf(10 to "A"),
                 10,
                 true
             ),
+            // Test 3: Tree with 2 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B"),
                 99,
@@ -69,21 +82,25 @@ class BSTreeTest {
 
         @JvmStatic
         fun eraseTestCases(): Stream<Arguments> = Stream.of(
+            // Test 1: Tree with 1 element
             Arguments.of(
                 listOf(10 to "A"),
                 10,
                 emptyList<Int>()
             ),
+            // Test 2: Tree with 2 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B"),
                 5,
                 listOf(10)
             ),
+            // Test 3: Tree with 3 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B", 15 to "C"),
                 10,
                 listOf(5, 15)
             ),
+            // Test 4: Tree with 4 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B", 15 to "C", 1 to "D"),
                 5,
@@ -93,22 +110,27 @@ class BSTreeTest {
 
         @JvmStatic
         fun insertTestCases(): Stream<Arguments> = Stream.of(
+            // Test 1: Insert 1 element
             Arguments.of(
                 listOf(10 to "A"),
                 listOf(10)
             ),
+            // Test 2: Insert 2 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B"),
                 listOf(5, 10)
             ),
+            // Test 3: Insert 3 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B", 15 to "C"),
                 listOf(5, 10, 15)
             ),
+            // Test 4: Insert 4 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B", 15 to "C", 1 to "D"),
                 listOf(1, 5, 10, 15)
             ),
+            // Test 5: Insert 5 elements
             Arguments.of(
                 listOf(10 to "A", 5 to "B", 15 to "C", 1 to "D", 7 to "E"),
                 listOf(1, 5, 7, 10, 15)
@@ -117,9 +139,18 @@ class BSTreeTest {
 
         @JvmStatic
         fun cleanTestCases(): Stream<Arguments> = Stream.of(
-            Arguments.of(listOf(10 to "A")),
-            Arguments.of(listOf(10 to "A", 5 to "B", 15 to "C")),
-            Arguments.of(listOf(10 to "A", 5 to "B", 15 to "C", 1 to "D", 7 to "E"))
+            // Test 1: Tree with 1 element
+            Arguments.of(
+                listOf(10 to "A")
+            ),
+            // Test 2: Tree with 3 elements
+            Arguments.of(
+                listOf(10 to "A", 5 to "B", 15 to "C")
+            ),
+            // Test 3: Tree with 5 elements
+            Arguments.of(
+                listOf(10 to "A", 5 to "B", 15 to "C", 1 to "D", 7 to "E")
+            )
         )
     }
 
@@ -166,10 +197,19 @@ class BSTreeTest {
     }
 
     @Test
+    fun `erase node with two children`() {
+        tree.insert(10, "A")
+        tree.insert(5, "B")
+        tree.insert(15, "C")
+        tree.erase(10)
+        assertFalse(tree.containsKey(10))
+        assertTrue(checker.checkTree())
+    }
+
+    @Test
     fun `tree should contain duplicate inserts correctly`() {
         tree.insert(66, "A")
         tree.insert(66, "B")
-
         assertEquals(1, checker.countNodes())
     }
 
@@ -186,9 +226,8 @@ class BSTreeTest {
     }
 
     @Test
-    fun `erase key from empty tree`() {
-        tree.erase(0)
-        assertEquals(0, checker.countNodes())
+    fun `iterator on empty tree`() {
+        assertFalse(tree.iterator().hasNext())
     }
 
     @Test
