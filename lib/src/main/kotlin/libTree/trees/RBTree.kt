@@ -86,7 +86,6 @@ class RBTree<K : Comparable<K>,V> private constructor(
      * @param value Value for the node
      */
     override fun insert(key: K, value: V) {
-        // Standard BST insert
         val newNode = RBNode(key, value)
         var parent: RBNode<K, V>? = null
         var current = root
@@ -109,7 +108,6 @@ class RBTree<K : Comparable<K>,V> private constructor(
         } else {
             parent.right = newNode
         }
-
         // Fix any violations
         fixInsertion(newNode)
     }
@@ -136,21 +134,21 @@ class RBTree<K : Comparable<K>,V> private constructor(
                 replacementNode = current.left
                 transplant(current, current.left)
             }
-            // Node z has two children
+            // Node current has two children
             else -> {
                 nodeToRemove = minimum(current.right ?: return)
                 val tmpColor = nodeToRemove.color
                 replacementNode = nodeToRemove.right
                 if (nodeToRemove.parent == current) {
-                    // If y is current's direct child
+                    // If nodeToRemove is current's direct child
                     replacementNode?.parent = nodeToRemove
                 } else {
-                    // Move y up
+                    // Move nodeToRemove up
                     transplant(nodeToRemove, nodeToRemove.right)
                     nodeToRemove.right = current.right
                     nodeToRemove.right?.parent = nodeToRemove
                 }
-                // Now replace current with y
+                // Now replace current with nodeToRemove
                 transplant(current, nodeToRemove)
                 nodeToRemove.left = current.left
                 nodeToRemove.left?.parent = nodeToRemove
@@ -177,9 +175,9 @@ class RBTree<K : Comparable<K>,V> private constructor(
      * @param node RBNode whose color we want to find out
      * @return Color
      */
-    private fun colorOf(n: RBNode<K, V>?): Color {
+    private fun colorOf(node: RBNode<K, V>?): Color {
         // null children are treated as BLACK
-        return n?.color ?: Color.BLACK
+        return node?.color ?: Color.BLACK
     }
 
     /**
@@ -188,17 +186,18 @@ class RBTree<K : Comparable<K>,V> private constructor(
      * @param node RBNode
      * @return RBNode parent
      */
-    private fun parentOf(n: RBNode<K, V>?): RBNode<K, V>? {
-        return n?.parent
+    private fun parentOf(node: RBNode<K, V>?): RBNode<K, V>? {
+        return node?.parent
     }
 
     /**
      * Help function for fixDeletion and fixInsertion
      *
      * @param node RBNode for setting color
+     * @param color Appropriate color
      */
-    private fun setColor(n: RBNode<K, V>?, c: Color) {
-        n?.color = c
+    private fun setColor(node: RBNode<K, V>?, color: Color) {
+        node?.color = color
     }
 
     /**
@@ -222,7 +221,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
     /**
      * Tree balancing after inserting an element
      *
-     * @param current - Node of the RBTree
+     * @param node - Node of the RBTree
      */
     private fun fixInsertion(node: RBNode<K, V>) {
         var current = node
@@ -358,8 +357,8 @@ class RBTree<K : Comparable<K>,V> private constructor(
     /**
      *   Replacing a subtree whose root is u with a subtree v (For erase)
      *
-     *   @param u - Node of the RBTree
-     *   @param v - Node of the RBTree
+     *   @param nodeToReplace - Node of the RBTree
+     *   @param replacement - Node of the RBTree
      */
     private fun transplant(nodeToReplace: RBNode<K, V>, replacement: RBNode<K, V>?) {
         if (nodeToReplace.parent == null) {
