@@ -1,0 +1,6 @@
+.gradle
+.idea
+lib/build
+examples/exampleAVL/build
+examples/exampleBST/build
+examples/exampleRB/build
