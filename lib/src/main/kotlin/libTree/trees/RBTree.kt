@@ -23,7 +23,6 @@ class RBTree<K : Comparable<K>,V> private constructor(
     private var root : RBNode<K,V>? = null,
 ) : Tree<K,V, RBTree.RBNode<K, V>> {
 
-
     /**
      * Node class representing each node in the Red Black Tree.
      *
@@ -50,7 +49,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
     ) : BaseNode<K, V, RBNode<K, V>>(key, value, left, right, height)
 
     /**
-     * Secondary constructor initializing an empty Red Black Tree Tree.
+     * Secondary constructor initializing an empty Red Black Tree
      */
     constructor() : this(null)
 
@@ -60,15 +59,6 @@ class RBTree<K : Comparable<K>,V> private constructor(
      * @return The root node
      */
     fun getRoot() : RBNode<K, V>? = root
-
-    /**
-     * Sets the root node of the RB tree.
-     *
-     * @param node The new root node
-     */
-    fun setRoot(node: RBNode<K,V>?) {
-        root = node
-    }
 
     /**
      * Calculates the height of the Red Black Tree.
@@ -130,44 +120,44 @@ class RBTree<K : Comparable<K>,V> private constructor(
      * @param key Key for the node
      */
     override fun erase(key: K) {
-        val z = findNode(key) ?: return  // Key not found, do nothing
-        var y = z
-        val yOriginalColor = y.color
-        var x: RBNode<K, V>? = null
+        val current = findNode(key) ?: return  // Key not found, do nothing
+        var nodeToRemove = current
+        val yOriginalColor = nodeToRemove.color
+        var replacementNode: RBNode<K, V>? = null
 
         when {
-            // Node z has no left child
-            z.left == null -> {
-                x = z.right
-                transplant(z, z.right)
+            // Node current has no left child
+            current.left == null -> {
+                replacementNode = current.right
+                transplant(current, current.right)
             }
-            // Node z has no right child
-            z.right == null -> {
-                x = z.left
-                transplant(z, z.left)
+            // Node current has no right child
+            current.right == null -> {
+                replacementNode = current.left
+                transplant(current, current.left)
             }
             // Node z has two children
             else -> {
-                y = minimum(z.right!!)
-                val tmpColor = y.color
-                x = y.right
-                if (y.parent == z) {
-                    // If y is z's direct child
-                    x?.parent = y
+                nodeToRemove = minimum(current.right ?: return)
+                val tmpColor = nodeToRemove.color
+                replacementNode = nodeToRemove.right
+                if (nodeToRemove.parent == current) {
+                    // If y is current's direct child
+                    replacementNode?.parent = nodeToRemove
                 } else {
                     // Move y up
-                    transplant(y, y.right)
-                    y.right = z.right
-                    y.right?.parent = y
+                    transplant(nodeToRemove, nodeToRemove.right)
+                    nodeToRemove.right = current.right
+                    nodeToRemove.right?.parent = nodeToRemove
                 }
-                // Now replace z with y
-                transplant(z, y)
-                y.left = z.left
-                y.left?.parent = y
-                y.color = z.color
+                // Now replace current with y
+                transplant(current, nodeToRemove)
+                nodeToRemove.left = current.left
+                nodeToRemove.left?.parent = nodeToRemove
+                nodeToRemove.color = current.color
                 // fixDeletion needs to know if we removed a black node
                 if (tmpColor == Color.BLACK) {
-                    fixDeletion(x)
+                    fixDeletion(replacementNode)
                 }
                 return
             }
@@ -175,7 +165,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
 
         // If a black node was physically removed, fix the tree
         if (yOriginalColor == Color.BLACK) {
-            fixDeletion(x)
+            fixDeletion(replacementNode)
         }
     }
 
@@ -208,7 +198,7 @@ class RBTree<K : Comparable<K>,V> private constructor(
      * @param node RBNode for setting color
      */
     private fun setColor(n: RBNode<K, V>?, c: Color) {
-        if (n != null) n.color = c
+        n?.color = c
     }
 
     /**
@@ -235,27 +225,27 @@ class RBTree<K : Comparable<K>,V> private constructor(
      * @param current - Node of the RBTree
      */
     private fun fixInsertion(node: RBNode<K, V>) {
-        var z = node
-        while (colorOf(parentOf(z)) == Color.RED) {
-            val gp = parentOf(parentOf(z)) ?: break// grandparent
+        var current = node
+        while (colorOf(parentOf(current)) == Color.RED) {
+            val gp = parentOf(parentOf(current)) ?: break// grandparent
 
-            if (parentOf(z) == gp.left) {
+            if (parentOf(current) == gp.left) {
                 val uncle = gp.right
                 if (colorOf(uncle) == Color.RED) {
                     // Case 1: Uncle is red
-                    setColor(parentOf(z), Color.BLACK)
+                    setColor(parentOf(current), Color.BLACK)
                     setColor(uncle, Color.BLACK)
                     setColor(gp, Color.RED)
-                    z = gp
+                    current = gp
                 } else {
                     // Case 2 or 3: Uncle is black
-                    if (z == parentOf(z)?.right) {
-                        // Case 2: z is right child => left rotate parent
-                        z = parentOf(z) ?: break
-                        rotateLeft(z)
+                    if (current == parentOf(current)?.right) {
+                        // Case 2: current is right child => left rotate parent
+                        current = parentOf(current) ?: break
+                        rotateLeft(current)
                     }
                     // Case 3
-                    setColor(parentOf(z), Color.BLACK)
+                    setColor(parentOf(current), Color.BLACK)
                     setColor(gp, Color.RED)
                     rotateRight(gp)
                 }
@@ -263,16 +253,16 @@ class RBTree<K : Comparable<K>,V> private constructor(
                 // Mirror
                 val uncle = gp.left
                 if (colorOf(uncle) == Color.RED) {
-                    setColor(parentOf(z), Color.BLACK)
+                    setColor(parentOf(current), Color.BLACK)
                     setColor(uncle, Color.BLACK)
                     setColor(gp, Color.RED)
-                    z = gp
+                    current = gp
                 } else {
-                    if (z == parentOf(z)?.left) {
-                        z = parentOf(z) ?: break
-                        rotateRight(z)
+                    if (current == parentOf(current)?.left) {
+                        current = parentOf(current) ?: break
+                        rotateRight(current)
                     }
-                    setColor(parentOf(z), Color.BLACK)
+                    setColor(parentOf(current), Color.BLACK)
                     setColor(gp, Color.RED)
                     rotateLeft(gp)
                 }
@@ -292,56 +282,56 @@ class RBTree<K : Comparable<K>,V> private constructor(
         while (node != root && colorOf(node) == Color.BLACK) {
             val p = parentOf(node) ?: break
             if (node == p.left) {
-                var w = p.right
-                if (colorOf(w) == Color.RED) {
+                var sibling = p.right
+                if (colorOf(sibling) == Color.RED) {
                     // Case 1: brother is red
-                    setColor(w, Color.BLACK)
+                    setColor(sibling, Color.BLACK)
                     setColor(p, Color.RED)
                     rotateLeft(p)
-                    w = p.right
+                    sibling = p.right
                 }
-                if (colorOf(w?.left) == Color.BLACK && colorOf(w?.right) == Color.BLACK) {
+                if (colorOf(sibling?.left) == Color.BLACK && colorOf(sibling?.right) == Color.BLACK) {
                     // Case 2: brother black, both children black
-                    setColor(w, Color.RED)
+                    setColor(sibling, Color.RED)
                     node = p
                 } else {
                     // Case 3 or 4
-                    if (colorOf(w?.right) == Color.BLACK) {
+                    if (colorOf(sibling?.right) == Color.BLACK) {
                         // Case 3: brother black, left child red, right child black
-                        setColor(w?.left, Color.BLACK)
-                        setColor(w, Color.RED)
-                        if (w != null) rotateRight(w)
-                        w = p.right
+                        setColor(sibling?.left, Color.BLACK)
+                        setColor(sibling, Color.RED)
+                        if (sibling != null) rotateRight(sibling)
+                        sibling = p.right
                     }
                     // Case 4: brother black, right child red
-                    setColor(w, colorOf(p))
+                    setColor(sibling, colorOf(p))
                     setColor(p, Color.BLACK)
-                    setColor(w?.right, Color.BLACK)
+                    setColor(sibling?.right, Color.BLACK)
                     rotateLeft(p)
                     node = root
                 }
             } else {
                 // Mirror
-                var w = p.left
-                if (colorOf(w) == Color.RED) {
-                    setColor(w, Color.BLACK)
+                var sibling = p.left
+                if (colorOf(sibling) == Color.RED) {
+                    setColor(sibling, Color.BLACK)
                     setColor(p, Color.RED)
                     rotateRight(p)
-                    w = p.left
+                    sibling = p.left
                 }
-                if (colorOf(w?.left) == Color.BLACK && colorOf(w?.right) == Color.BLACK) {
-                    setColor(w, Color.RED)
+                if (colorOf(sibling?.left) == Color.BLACK && colorOf(sibling?.right) == Color.BLACK) {
+                    setColor(sibling, Color.RED)
                     node = p
                 } else {
-                    if (colorOf(w?.left) == Color.BLACK) {
-                        setColor(w?.right, Color.BLACK)
-                        setColor(w, Color.RED)
-                        if (w != null) rotateLeft(w)
-                        w = p.left
+                    if (colorOf(sibling?.left) == Color.BLACK) {
+                        setColor(sibling?.right, Color.BLACK)
+                        setColor(sibling, Color.RED)
+                        if (sibling != null) rotateLeft(sibling)
+                        sibling = p.left
                     }
-                    setColor(w, colorOf(p))
+                    setColor(sibling, colorOf(p))
                     setColor(p, Color.BLACK)
-                    setColor(w?.left, Color.BLACK)
+                    setColor(sibling?.left, Color.BLACK)
                     rotateRight(p)
                     node = root
                 }
@@ -371,16 +361,16 @@ class RBTree<K : Comparable<K>,V> private constructor(
      *   @param u - Node of the RBTree
      *   @param v - Node of the RBTree
      */
-    private fun transplant(u: RBNode<K, V>, v: RBNode<K, V>?) {
-        if (u.parent == null) {
-            root = v
-        } else if (u == u.parent?.left) {
-            u.parent?.left = v
+    private fun transplant(nodeToReplace: RBNode<K, V>, replacement: RBNode<K, V>?) {
+        if (nodeToReplace.parent == null) {
+            root = replacement
+        } else if (nodeToReplace == nodeToReplace.parent?.left) {
+            nodeToReplace.parent?.left = replacement
         } else {
-            u.parent?.right = v
+            nodeToReplace.parent?.right = replacement
         }
-        if (v != null) {
-            v.parent = u.parent
+        if (replacement != null) {
+            replacement.parent = nodeToReplace.parent
         }
     }
 
@@ -398,43 +388,43 @@ class RBTree<K : Comparable<K>,V> private constructor(
     /**
      * Performs a left rotation around a given node.
      */
-    private fun rotateLeft(x: RBNode<K, V>) {
-        val y = x.right  ?: return
-        x.right = y.left
-        if (y.left != null) {
-            (y.left as RBNode<K, V>).parent = x
+    private fun rotateLeft(node: RBNode<K, V>) {
+        val rightChild = node.right  ?: return
+        node.right = rightChild.left
+        if (rightChild.left != null) {
+            (rightChild.left as RBNode<K, V>).parent = node
         }
-        y.parent = x.parent
-        if (x.parent == null) { // Nothing to turn
-            root = y
-        } else if (x == x.parent?.left) { // Node glory from parent
-            x.parent?.left = y
+        rightChild.parent = node.parent
+        if (node.parent == null) { // Nothing to turn
+            root = rightChild
+        } else if (node == node.parent?.left) { // Node glory from parent
+            node.parent?.left = rightChild
         } else {
-            x.parent?.right = y
+            node.parent?.right = rightChild
         }
-        y.left = x
-        x.parent = y
+        rightChild.left = node
+        node.parent = rightChild
     }
 
     /**
      * Performs a right rotation around a given node.
      */
-    private fun rotateRight(x: RBNode<K, V>) {
-        val y = x.left  ?: return
-        x.left = y.right
-        if (y.right != null) {
-            (y.right as RBNode<K, V>).parent = x
+    private fun rotateRight(node: RBNode<K, V>) {
+        val leftChild = node.left  ?: return
+        node.left = leftChild.right
+        if (leftChild.right != null) {
+            (leftChild.right as RBNode<K, V>).parent = node
         }
-        y.parent = x.parent
-        if (x.parent == null) {
-            root = y
-        } else if (x == x.parent?.right) {
-            x.parent?.right = y
+        leftChild.parent = node.parent
+        if (node.parent == null) {
+            root = leftChild
+        } else if (node == node.parent?.right) {
+            node.parent?.right = leftChild
         } else {
-            x.parent?.left = y
+            node.parent?.left = leftChild
         }
-        y.right = x
-        x.parent = y
+        leftChild.right = node
+        node.parent = leftChild
     }
 
     /**
