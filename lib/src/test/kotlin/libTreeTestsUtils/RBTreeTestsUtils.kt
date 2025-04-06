@@ -60,7 +60,4 @@ class UtilsFunctionsRBTree<K : Comparable<K>, V>(private val tree: RBTree<K, V>)
         val rightHeight = getHeightRecursive(node.right)
         return 1 + maxOf(leftHeight, rightHeight)
     }
-
-
 }
-
