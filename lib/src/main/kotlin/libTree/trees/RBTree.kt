@@ -411,9 +411,8 @@ class RBTree<K : Comparable<K>,V> private constructor(
     private fun rotateRight(node: RBNode<K, V>) {
         val leftChild = node.left  ?: return
         node.left = leftChild.right
-        if (leftChild.right != null) {
-            (leftChild.right as RBNode<K, V>).parent = node
-        }
+        leftChild.right?.parent = node
+
         leftChild.parent = node.parent
         if (node.parent == null) {
             root = leftChild
