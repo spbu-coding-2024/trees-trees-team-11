@@ -207,6 +207,12 @@ class BSTreeTest {
     }
 
     @Test
+    fun `erase key from empty tree`() {
+        tree.erase(0)
+        assertEquals(0, checker.countNodes())
+    }
+
+    @Test
     fun `tree should contain duplicate inserts correctly`() {
         tree.insert(66, "A")
         tree.insert(66, "B")
