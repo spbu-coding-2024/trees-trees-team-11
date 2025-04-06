@@ -56,7 +56,7 @@ class AVLTree<K : Comparable<K>, V> private constructor (
      * @return Height of the tree
      */
     override fun height(): Int {
-        return heightOfTree(root)
+        return root?.height?.toInt() ?: 0
     }
 
     /**
@@ -131,6 +131,14 @@ class AVLTree<K : Comparable<K>, V> private constructor (
         return node.height
     }
 
+
+    /**
+     * Updated height of current node
+     */
+    private fun updateHeight(node: AVLNode<K, V>?) : Long {
+        return 1 + max(heightNode(node?.left), heightNode(node?.right))
+    }
+
     /**
      * Performs a right rotation around a given node.
      */
@@ -141,8 +149,8 @@ class AVLTree<K : Comparable<K>, V> private constructor (
         newNode?.right = node
         node?.left = tempNode
 
-        node?.height = 1 + max(heightNode(node?.left), heightNode(node?.right))
-        newNode?.height = 1 + max(heightNode(newNode?.left), heightNode(newNode?.right))
+        node?.height = updateHeight(node)
+        newNode?.height = updateHeight(newNode)
 
         return newNode
     }
@@ -157,8 +165,8 @@ class AVLTree<K : Comparable<K>, V> private constructor (
         newNode?.left = node
         node?.right = tempNode
 
-        node?.height = 1 + max(heightNode(node?.left), heightNode(node?.right))
-        newNode?.height = 1 + max(heightNode(newNode?.left), heightNode(newNode?.right))
+        node?.height = updateHeight(node)
+        newNode?.height = updateHeight(newNode)
 
         return newNode
     }
@@ -232,6 +240,7 @@ class AVLTree<K : Comparable<K>, V> private constructor (
                     val tempNode = minValueNode(localNode.right)
                     if (tempNode != null) {
                         localNode.key = tempNode.key
+                        localNode.value = tempNode.value
                         localNode.right = eraseNode(localNode.right, tempNode.key)
                     }
 
@@ -266,14 +275,6 @@ class AVLTree<K : Comparable<K>, V> private constructor (
         }
 
         return localNode
-    }
-
-    /**
-     * Returns the height of the tree from the specified node.
-     */
-    private fun heightOfTree(node: AVLNode<K, V>?): Int {
-        if (node == null) return 0
-        return 1 + max(heightOfTree(node.left), heightOfTree(node.right))
     }
 
     /**

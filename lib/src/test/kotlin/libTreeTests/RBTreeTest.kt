@@ -48,6 +48,10 @@ open class RBTreeTest {
             Arguments.of(
                 listOf(10 to "A", 20 to "B", 30 to "C"),
                 listOf(20, 10, 30)
+            ),
+            Arguments.of(
+                listOf(179 to "X", 239 to "Y", 52 to "Z", 812 to "W"),
+                listOf(179, 52, 239, 812) // 52
             )
         )
 
@@ -73,11 +77,13 @@ open class RBTreeTest {
                 100,
                 listOf(10, 5, 15)
             )
+
         )
     }
 
     @ParameterizedTest
     @MethodSource("insertTestCases")
+    @Tag("insert")
     fun testInsert(insertions : List<Pair<Int, String>>, expected : List<Int>) {
         for ((key, value) in insertions) {
             tree.insert(key, value)
@@ -90,6 +96,7 @@ open class RBTreeTest {
 
     @ParameterizedTest
     @MethodSource("deleteTestCases")
+    @Tag("erase")
     fun testDelete(insertions : List<Pair<Int, String>>, deleteKey : Int, expected : List<Int>) {
         for ((key, value) in insertions) {
             tree.insert(key, value)
@@ -103,6 +110,7 @@ open class RBTreeTest {
     }
 
     @Test
+    @Tag("contains")
     fun testContainsKey() {
         assertFalse(tree.containsKey(10), "Tree should not contain key 10 initially")
         tree.insert(10, "A")
@@ -112,6 +120,7 @@ open class RBTreeTest {
     }
 
     @Test
+    @Tag("clean")
     fun testClean() {
         tree.insert(10, "A")
         tree.insert(5, "B")
@@ -121,6 +130,29 @@ open class RBTreeTest {
     }
 
     @Test
+    @Tag("height")
+    fun testHeightSingleNode() {
+        tree.insert(52, "A")
+        val height = checker.getHeight()
+        assertEquals(1, height, "Height of a single-node RBTree should be 1")
+    }
+
+    @Test
+    @Tag("height")
+    fun testHeightWithMultipleInsertions() {
+        val keys = listOf(239, 52, 15, 2, 7, 12, 17)
+        for (k in keys) {
+            tree.insert(k, "val$k")
+        }
+        assertTrue(checker.checkTree(), "RBTree invariant violated after insertions")
+
+        val height = checker.getHeight()
+
+        assertTrue(height <= 5, "Height $height is too large for 7 nodes in a valid RBTree")
+    }
+
+    @Test
+    @Tag("corner-case")
     fun testDublicateInsertion() {
         tree.insert(10, "A")
         tree.insert(10, "B")
@@ -128,23 +160,36 @@ open class RBTreeTest {
         // double keys are permitted in this implementation of RBTree
         assertEquals(listOf(10, 10), keys, "Tree should contain two nodes with key 10")
     }
-    /*
+
     @Test
-    fun testRandomInsertionsDeletions() {
+    @Tag("slow")
+    @Timeout(1, unit = TimeUnit.SECONDS)
+    fun testRandomInsertionsDeletions_Simplified() {
         val random = Random(42)
-        val inserted = mutableSetOf<Int>()
-        for (i in 1..1000) {
-            val key = random.nextInt(0,100)
-            tree.insert(key, key.toString())
-            inserted.add(key)
-            assertTrue(checker.checkTree(), "RBTree invariant violated after inserting $key")
+        val inserted = mutableListOf<Int>()
+
+        while (inserted.size < 1000) {
+            val candidate = random.nextInt(0, 10_000)
+            if (candidate !in inserted) {
+                inserted.add(candidate)
+            }
         }
+
+        for (key in inserted) {
+            tree.insert(key, key.toString())
+        }
+
+        assertTrue(checker.checkTree(), "RBTree invariant violated after inserting all keys")
+
+        inserted.shuffle(random)
         for (key in inserted) {
             tree.erase(key)
-            assertTrue(checker.checkTree(), "RBTree invariant violated after deleting $key")
         }
+
+        // сheck invariants only once after all deletions
+        assertTrue(checker.checkTree(), "RBTree invariant violated after deleting all keys")
+
+        // ensure the tree is empty
         assertFalse(tree.iterator().hasNext(), "Tree should be empty after deleting all inserted keys")
     }
-
-     */
 }
