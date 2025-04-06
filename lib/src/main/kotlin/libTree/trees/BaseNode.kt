@@ -1,6 +1,5 @@
 package libTree.trees
 
-
 open class BaseNode<K: Comparable<K>,V, TreeNode> (
     var key: K,
     var value: V,
