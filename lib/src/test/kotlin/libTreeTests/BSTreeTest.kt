@@ -123,9 +123,6 @@ class BSTreeTest {
         )
     }
 
-
-
-
     @ParameterizedTest
     @MethodSource("heightTestCases")
     fun testHeight(inserts: List<Pair<Int, String>>, expectedHeightOfTree: Int) {
