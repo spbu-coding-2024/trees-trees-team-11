@@ -362,16 +362,16 @@ class RBTree<K : Comparable<K>, V> private constructor(
      *   @param u - Node of the RBTree
      *   @param v - Node of the RBTree
      */
-    private fun transplant(u: RBNode<K, V>, v: RBNode<K, V>?) {
-        if (u.parent == null) {
-            root = v
-        } else if (u == u.parent?.left) {
-            u.parent?.left = v
+    private fun transplant(nodeToReplace: RBNode<K, V>, replacement: RBNode<K, V>?) {
+        if (nodeToReplace.parent == null) {
+            root = replacement
+        } else if (nodeToReplace == nodeToReplace.parent?.left) {
+            nodeToReplace.parent?.left = replacement
         } else {
-            u.parent?.right = v
+            nodeToReplace.parent?.right = replacement
         }
-        if (v != null) {
-            v.parent = u.parent
+        if (replacement != null) {
+            replacement.parent = nodeToReplace.parent
         }
     }
 
@@ -389,39 +389,38 @@ class RBTree<K : Comparable<K>, V> private constructor(
     /**
      * Performs a left rotation around a given node.
      */
-    private fun rotateLeft(x: RBNode<K, V>) {
-        val y = x.right ?: return
-        x.right = y.left
-        y.left?.parent = x
-        y.parent = x.parent
-        if (x.parent == null) { // Nothing to turn
-            root = y
-        } else if (x == x.parent?.left) { // Node glory from parent
-            x.parent?.left = y
+    private fun rotateLeft(nodeToRotate: RBNode<K, V>) {
+        val rightChild = nodeToRotate.right ?: return
+        nodeToRotate.right = rightChild.left
+        rightChild.left?.parent = nodeToRotate
+        rightChild.parent = nodeToRotate.parent
+        if (nodeToRotate.parent == null) { // Nothing to turn
+            root = rightChild
+        } else if (nodeToRotate == nodeToRotate.parent?.left) { // Node glory from parent
+            nodeToRotate.parent?.left = rightChild
         } else {
-            x.parent?.right = y
+            nodeToRotate.parent?.right = rightChild
         }
-        y.left = x
-        x.parent = y
+        rightChild.left = nodeToRotate
+        nodeToRotate.parent = rightChild
     }
-
     /**
      * Performs a right rotation around a given node.
      */
-    private fun rotateRight(x: RBNode<K, V>) {
-        val y = x.left ?: return
-        x.left = y.right
-        y.left?.parent = x
-        y.parent = x.parent
-        if (x.parent == null) {
-            root = y
-        } else if (x == x.parent?.right) {
-            x.parent?.right = y
+    private fun rotateRight(nodeToRotate: RBNode<K, V>) {
+        val leftChild = nodeToRotate.left ?: return
+        nodeToRotate.left = leftChild.right
+        leftChild.left?.parent = nodeToRotate
+        leftChild.parent = nodeToRotate.parent
+        if (nodeToRotate.parent == null) {
+            root = leftChild
+        } else if (nodeToRotate == nodeToRotate.parent?.right) {
+            nodeToRotate.parent?.right = leftChild
         } else {
-            x.parent?.left = y
+            nodeToRotate.parent?.left = leftChild
         }
-        y.right = x
-        x.parent = y
+        leftChild.right = nodeToRotate
+        nodeToRotate.parent = leftChild
     }
 
     /**
