@@ -1,5 +1,6 @@
 package libTree.trees
 
+
 import libTree.interfaceTree.Tree
 import kotlin.math.max
 
@@ -18,10 +19,9 @@ import kotlin.math.max
  *   5) a black node can have a black parent
  */
 
-class RBTree<K : Comparable<K>, V> private constructor(
-    private var root: RBNode<K, V>? = null,
-) : Tree<K, V, RBTree.RBNode<K, V>> {
-
+class RBTree<K : Comparable<K>,V> private constructor(
+    private var root : RBNode<K,V>? = null,
+) : Tree<K,V, RBTree.RBNode<K, V>> {
 
     /**
      * Node class representing each node in the Red Black Tree.
@@ -38,8 +38,7 @@ class RBTree<K : Comparable<K>, V> private constructor(
         RED,
         BLACK,
     }
-
-    class RBNode<K : Comparable<K>, V> internal constructor(
+    class RBNode<K : Comparable<K>, V> internal constructor (
         key: K,
         value: V,
         override var left: RBNode<K, V>? = null,
@@ -50,7 +49,7 @@ class RBTree<K : Comparable<K>, V> private constructor(
     ) : BaseNode<K, V, RBNode<K, V>>(key, value, left, right, height)
 
     /**
-     * Secondary constructor initializing an empty Red Black Tree Tree.
+     * Secondary constructor initializing an empty Red Black Tree
      */
     constructor() : this(null)
 
@@ -59,7 +58,7 @@ class RBTree<K : Comparable<K>, V> private constructor(
      *
      * @return The root node
      */
-    fun getRoot(): RBNode<K, V>? = root
+    fun getRoot() : RBNode<K, V>? = root
 
     /**
      * Calculates the height of the Red Black Tree.
@@ -87,7 +86,6 @@ class RBTree<K : Comparable<K>, V> private constructor(
      * @param value Value for the node
      */
     override fun insert(key: K, value: V) {
-        // Standard BST insert
         val newNode = RBNode(key, value)
         var parent: RBNode<K, V>? = null
         var current = root
@@ -110,7 +108,6 @@ class RBTree<K : Comparable<K>, V> private constructor(
         } else {
             parent.right = newNode
         }
-
         // Fix any violations
         fixInsertion(newNode)
     }
@@ -123,7 +120,7 @@ class RBTree<K : Comparable<K>, V> private constructor(
     override fun erase(key: K) {
         val current = findNode(key) ?: return  // Key not found, do nothing
         var nodeToRemove = current
-        val originalColor = nodeToRemove.color
+        val yOriginalColor = nodeToRemove.color
         var replacementNode: RBNode<K, V>? = null
 
         when {
@@ -139,7 +136,7 @@ class RBTree<K : Comparable<K>, V> private constructor(
             }
             // Node current has two children
             else -> {
-                nodeToRemove = minimum(current?.right ?: return)
+                nodeToRemove = minimum(current.right ?: return)
                 val tmpColor = nodeToRemove.color
                 replacementNode = nodeToRemove.right
                 if (nodeToRemove.parent == current) {
@@ -165,7 +162,7 @@ class RBTree<K : Comparable<K>, V> private constructor(
         }
 
         // If a black node was physically removed, fix the tree
-        if (originalColor == Color.BLACK) {
+        if (yOriginalColor == Color.BLACK) {
             fixDeletion(replacementNode)
         }
     }
@@ -178,9 +175,9 @@ class RBTree<K : Comparable<K>, V> private constructor(
      * @param node RBNode whose color we want to find out
      * @return Color
      */
-    private fun colorOf(n: RBNode<K, V>?): Color {
+    private fun colorOf(node: RBNode<K, V>?): Color {
         // null children are treated as BLACK
-        return n?.color ?: Color.BLACK
+        return node?.color ?: Color.BLACK
     }
 
     /**
@@ -189,17 +186,18 @@ class RBTree<K : Comparable<K>, V> private constructor(
      * @param node RBNode
      * @return RBNode parent
      */
-    private fun parentOf(n: RBNode<K, V>?): RBNode<K, V>? {
-        return n?.parent
+    private fun parentOf(node: RBNode<K, V>?): RBNode<K, V>? {
+        return node?.parent
     }
 
     /**
      * Help function for fixDeletion and fixInsertion
      *
      * @param node RBNode for setting color
+     * @param color Appropriate color
      */
-    private fun setColor(n: RBNode<K, V>?, c: Color) {
-        n?.color = c
+    private fun setColor(node: RBNode<K, V>?, color: Color) {
+        node?.color = color
     }
 
     /**
@@ -223,7 +221,7 @@ class RBTree<K : Comparable<K>, V> private constructor(
     /**
      * Tree balancing after inserting an element
      *
-     * @param current - Node of the RBTree
+     * @param node - Node of the RBTree
      */
     private fun fixInsertion(node: RBNode<K, V>) {
         var current = node
@@ -241,7 +239,7 @@ class RBTree<K : Comparable<K>, V> private constructor(
                 } else {
                     // Case 2 or 3: Uncle is black
                     if (current == parentOf(current)?.right) {
-                        // Case 2: z is right child => left rotate parent
+                        // Case 2: current is right child => left rotate parent
                         current = parentOf(current) ?: break
                         rotateLeft(current)
                     }
@@ -359,8 +357,8 @@ class RBTree<K : Comparable<K>, V> private constructor(
     /**
      *   Replacing a subtree whose root is u with a subtree v (For erase)
      *
-     *   @param u - Node of the RBTree
-     *   @param v - Node of the RBTree
+     *   @param nodeToReplace - Node of the RBTree
+     *   @param replacement - Node of the RBTree
      */
     private fun transplant(nodeToReplace: RBNode<K, V>, replacement: RBNode<K, V>?) {
         if (nodeToReplace.parent == null) {
@@ -376,12 +374,12 @@ class RBTree<K : Comparable<K>, V> private constructor(
     }
 
     /**
-     * Finds the node with the minimum key starting from given node.
+     * Finds the node with the minimum key starting from a given node.
      */
-    private fun minimum(node: RBNode<K, V>): RBNode<K, V> {
+    private fun minimum(node : RBNode<K, V>) : RBNode<K, V> {
         var current = node
         while (current.left != null) {
-            current = current.left as RBNode<K, V>
+            current = current.left as RBNode<K,V>
         }
         return current
     }
@@ -390,13 +388,15 @@ class RBTree<K : Comparable<K>, V> private constructor(
      * Performs a left rotation around a given node.
      */
     private fun rotateLeft(node: RBNode<K, V>) {
-        val rightChild = node.right ?: return
+        val rightChild = node.right  ?: return
         node.right = rightChild.left
-        rightChild.left?.parent = node
+        if (rightChild.left != null) {
+            (rightChild.left as RBNode<K, V>).parent = node
+        }
         rightChild.parent = node.parent
         if (node.parent == null) { // Nothing to turn
             root = rightChild
-        } else if (node == node.parent?.left) { // Node glorrightChild from parent
+        } else if (node == node.parent?.left) { // Node glory from parent
             node.parent?.left = rightChild
         } else {
             node.parent?.right = rightChild
@@ -409,9 +409,10 @@ class RBTree<K : Comparable<K>, V> private constructor(
      * Performs a right rotation around a given node.
      */
     private fun rotateRight(node: RBNode<K, V>) {
-        val leftChild = node.left ?: return
+        val leftChild = node.left  ?: return
         node.left = leftChild.right
-        leftChild.left?.parent = node
+        leftChild.right?.parent = node
+
         leftChild.parent = node.parent
         if (node.parent == null) {
             root = leftChild
